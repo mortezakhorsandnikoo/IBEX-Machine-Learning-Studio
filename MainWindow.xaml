@@ -1,0 +1,97 @@
+<Window x:Class="ArchiAI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="IBEX Machine Learning Studio" Height="900" Width="1440" MinHeight="700" MinWidth="1120"
+        Background="#F4F6FA" WindowStartupLocation="CenterScreen" FontFamily="Segoe UI" FontSize="13"
+        TextOptions.TextFormattingMode="Display" UseLayoutRounding="True">
+    <Window.Resources>
+        <Style x:Key="NavigationItem" TargetType="RadioButton">
+            <Setter Property="Foreground" Value="#A8B5CC"/>
+            <Setter Property="Margin" Value="12,3"/>
+            <Setter Property="Padding" Value="14,12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Tile" Background="Transparent" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Tile" Property="Background" Value="#1C2B42"/></Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Tile" Property="Background" Value="#263D58"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Tile" Property="BorderBrush" Value="#61D4C3"/><Setter TargetName="Tile" Property="BorderThickness" Value="1"/></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="196"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <Border Background="#101D30">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Margin="26,30,20,28">
+                    <TextBlock Text="IBEX" FontSize="32" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock Text="MACHINE LEARNING STUDIO" FontSize="9" Foreground="#7ED9CB" Margin="1,5,0,0"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom">
+                    <RadioButton x:Name="HelpNav" Content="Help and user guide" Tag="7" GroupName="Navigation" Style="{StaticResource NavigationItem}" Click="Navigate_Click"/>
+                    <Button x:Name="CheatSheetButton" Click="CheatSheet_Click" Margin="12,3" Padding="14,10" Foreground="#8BEBDA" Background="#1C2F43" Cursor="Hand" HorizontalContentAlignment="Left" ToolTip="Open the illustrated PDF directly. Press Ctrl+P in your PDF reader to print." AutomationProperties.Name="ML cheat sheet - open PDF to print">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="CheatTile" Background="{TemplateBinding Background}" BorderBrush="#387B74" BorderThickness="1" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="CheatTile" Property="Background" Value="#284D53"/></Trigger>
+                                    <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="CheatTile" Property="BorderBrush" Value="#8BEBDA"/><Setter TargetName="CheatTile" Property="BorderThickness" Value="2"/></Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <StackPanel>
+                            <TextBlock Text="ML cheat sheet" FontWeight="SemiBold"/>
+                            <TextBlock Text="Open PDF · Print" FontSize="10" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <StackPanel Margin="26,16,20,24">
+                    <Border Background="#1C2F43" CornerRadius="6" Padding="10,7" HorizontalAlignment="Left">
+                        <TextBlock Text="LOCAL WORKSPACE" FontSize="10" Foreground="#7ED9CB"/>
+                    </Border>
+                    <TextBlock Text="Explore. Train. Understand." Foreground="#889AB4" FontSize="11" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <RadioButton x:Name="HomeNav" Content="Home" Tag="-1" GroupName="Navigation" Style="{StaticResource NavigationItem}" Click="Navigate_Click" IsChecked="True"/>
+                    <TextBlock Text="WORKSPACE" Foreground="#6C819D" FontSize="10" FontWeight="SemiBold" Margin="26,24,0,10"/>
+                    <RadioButton x:Name="DataNav" Content="01   Dataset" Tag="0" GroupName="Navigation" Style="{StaticResource NavigationItem}" Click="Navigate_Click"/>
+                    <RadioButton x:Name="PrepNav" Content="02   Prepare data" Tag="1" GroupName="Navigation" Style="{StaticResource NavigationItem}" Click="Navigate_Click"/>
+                    <RadioButton x:Name="RegNav" Content="03   Regression" Tag="2" GroupName="Navigation" Style="{StaticResource NavigationItem}" Click="Navigate_Click"/>
+                    <RadioButton x:Name="ClsNav" Content="04   Classification" Tag="3" GroupName="Navigation" Style="{StaticResource NavigationItem}" Click="Navigate_Click"/>
+                    <RadioButton x:Name="ClustNav" Content="05   Clustering" Tag="4" GroupName="Navigation" Style="{StaticResource NavigationItem}" Click="Navigate_Click"/>
+                    <TextBlock Text="INSIGHTS" Foreground="#6C819D" FontSize="10" FontWeight="SemiBold" Margin="26,24,0,10"/>
+                    <RadioButton x:Name="CompareNav" Content="Compare models" Tag="5" GroupName="Navigation" Style="{StaticResource NavigationItem}" Click="Navigate_Click"/>
+                    <RadioButton x:Name="VizNav" Content="Visualize" Tag="6" GroupName="Navigation" Style="{StaticResource NavigationItem}" Click="Navigate_Click"/>
+                </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions><RowDefinition Height="88"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+            <Border Background="White" BorderBrush="#E2E7EF" BorderThickness="0,0,0,1" Padding="28,16">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Help · F1" Click="Help_Click" Foreground="#087F73" Background="White" BorderBrush="#D9E5E2" Padding="12,7" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                    <StackPanel>
+                        <TextBlock x:Name="SectionTitle" Text="Welcome to your studio" FontSize="22" FontWeight="SemiBold" Foreground="#172B45"/>
+                        <TextBlock x:Name="SectionSubtitle" Text="A clear path from data to discovery." Foreground="#64748B" Margin="0,5,14,0"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+            <Frame Grid.Row="1" x:Name="MainFrame" NavigationUIVisibility="Hidden" Background="Transparent"/>
+        </Grid>
+    </Grid>
+</Window>

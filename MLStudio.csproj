@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+	<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>ArchiAI</RootNamespace>
+    <AssemblyName>IBEX.MLStudio</AssemblyName>
+    <Product>IBEX Machine Learning Studio</Product>
+    <Title>IBEX Machine Learning Studio</Title>
+    <Description>A local workspace for exploring data and training machine learning models.</Description>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon Condition="Exists('app.ico')">app.ico</ApplicationIcon>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Tests/**/*.cs" />
+    <EmbeddedResource Remove="Tests/**/*" />
+    <None Remove="Tests/**/*" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc3.3" />
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML.FastTree" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML.LightGbm" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.17.1" />
+    <PackageReference Include="XGBoostSharp-cpu" Version="0.5.29" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets/ibex.png" />
+    <Resource Include="Help/guide.json" />
+    <Resource Include="Help/IBEX_Machine_Learning_Cheat_Sheet.pdf" />
+    <Resource Include="Help/Images/*.png" />
+    <Content Include="Samples/*.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="app.ico" Condition="Exists('app.ico')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition="'$(PublishSingleFile)' == 'true' and '$(SingleFileExtrasDirectory)' != ''">
+    <Content Include="$(SingleFileExtrasDirectory)/**/*">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+</Project>
