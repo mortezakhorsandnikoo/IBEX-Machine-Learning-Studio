@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use IBEX Machine Learning Studio, please cite it as below."
+title: "IBEX Machine Learning Studio"
+version: 1.0.1
+doi: 10.5281/zenodo.23136448
+date-released: 2026-10-04
+authors:
+  - family-names: "Khorsand Nikoo"
+    given-names: "Morteza"
+    affiliation: "University of Innsbruck, Faculty of Architecture"
+repository-code: "https://github.com/mortezakhorsandnikoo/IBEX-Machine-Learning-Studio"
+license: GPL-3.0-or-later
