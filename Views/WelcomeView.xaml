@@ -1,0 +1,74 @@
+<Page x:Class="ArchiAI.Views.WelcomeView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="#F4F6FA">
+    <Page.Resources>
+        <Style x:Key="TaskCard" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="White"/><Setter Property="BorderBrush" Value="#E2E7EF"/>
+            <Setter Property="BorderThickness" Value="1"/><Setter Property="Padding" Value="22"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="VerticalContentAlignment" Value="Top"/>
+        </Style>
+    </Page.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel x:Name="CoverContent" Margin="28,26,28,28">
+            <Border CornerRadius="16" Padding="32" Background="#172B45">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="1.45*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                        <TextBlock Text="YOUR NEXT DISCOVERY STARTS HERE" FontSize="10" FontWeight="SemiBold" Foreground="#7ED9CB"/>
+                        <TextBlock Text="Make sense of data.&#10;Build with confidence." FontSize="34" FontWeight="SemiBold" Foreground="White" Margin="0,16,0,14" TextWrapping="Wrap"/>
+                        <TextBlock Text="A focused workspace for exploring datasets, training models and understanding every result." FontSize="14" Foreground="#B8C8DA" TextWrapping="Wrap" LineHeight="23" MaxWidth="490" HorizontalAlignment="Left"/>
+
+                        <TextBlock Text="CSV datasets · Local training · Exportable results" Foreground="#8FA5BF" FontSize="11" Margin="0,24,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image x:Name="CoverLogo" Source="/IBEX.MLStudio;component/Assets/ibex.png" Width="270" Height="195" Stretch="Uniform" AutomationProperties.Name="IBEX logo"/>
+                        <TextBlock Text="IBEX" FontSize="32" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" Margin="0,8,0,4"/>
+                        <TextBlock Text="MACHINE LEARNING STUDIO" FontSize="10" Foreground="#7ED9CB" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <DockPanel Margin="0,28,0,14">
+                <TextBlock Text="Choose your starting point" FontSize="20" FontWeight="SemiBold" Foreground="#172B45"/>
+            </DockPanel>
+            <UniformGrid Columns="3">
+                <Button Style="{StaticResource TaskCard}" Margin="0,0,12,0" Tag="2" Click="Task_Click">
+                    <StackPanel>
+                        <TextBlock Text="01 / PREDICT" Foreground="#087F73" FontSize="10" FontWeight="Bold"/>
+                        <TextBlock Text="Regression" FontSize="19" FontWeight="SemiBold" Foreground="#172B45" Margin="0,12,0,8"/>
+                        <TextBlock Text="Model continuous outcomes with linear, polynomial and ensemble methods." Foreground="#64748B" TextWrapping="Wrap" LineHeight="21"/>
+                        <TextBlock Text="Explore regression  →" Foreground="#087F73" FontWeight="SemiBold" Margin="0,18,0,0"/>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource TaskCard}" Margin="0,0,12,0" Tag="3" Click="Task_Click">
+                    <StackPanel>
+                        <TextBlock Text="02 / CLASSIFY" Foreground="#5562AA" FontSize="10" FontWeight="Bold"/>
+                        <TextBlock Text="Classification" FontSize="19" FontWeight="SemiBold" Foreground="#172B45" Margin="0,12,0,8"/>
+                        <TextBlock Text="Learn from labeled examples and evaluate how well your model distinguishes classes." Foreground="#64748B" TextWrapping="Wrap" LineHeight="21"/>
+                        <TextBlock Text="Explore classification  →" Foreground="#5562AA" FontWeight="SemiBold" Margin="0,18,0,0"/>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource TaskCard}" Tag="4" Click="Task_Click">
+                    <StackPanel>
+                        <TextBlock Text="03 / DISCOVER" Foreground="#A56825" FontSize="10" FontWeight="Bold"/>
+                        <TextBlock Text="Clustering" FontSize="19" FontWeight="SemiBold" Foreground="#172B45" Margin="0,12,0,8"/>
+                        <TextBlock Text="Find natural groups and uncover patterns without predefined labels." Foreground="#64748B" TextWrapping="Wrap" LineHeight="21"/>
+                        <TextBlock Text="Explore clustering  →" Foreground="#A56825" FontWeight="SemiBold" Margin="0,18,0,0"/>
+                    </StackPanel>
+                </Button>
+            </UniformGrid>
+            <Border Background="White" BorderBrush="#E2E7EF" BorderThickness="1" CornerRadius="10" Padding="22,18" Margin="0,20,0,0">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Margin="24,0,0,0" FontSize="13">
+                        <Hyperlink NavigateUri="https://ko-fi.com/mortezakhorsand" RequestNavigate="Support_RequestNavigate"
+                                   Foreground="#087F73" ToolTip="Support IBEX on Ko-fi (opens in your browser)">Buy me a coffee ↗</Hyperlink>
+                    </TextBlock>
+                <StackPanel>
+                    <TextBlock Text="Designed by: Morteza Khorsand Nikoo" FontWeight="SemiBold" Foreground="#172B45" FontSize="15" TextWrapping="Wrap"/>
+                    <TextBlock Text="morteza.khorsandnikoo@uibk.ac.at" Foreground="#087F73" FontSize="13" Margin="0,7,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+                </DockPanel>
+            </Border>
+            <TextBlock Text="YOUR WORKFLOW     Import data  →  Prepare features  →  Train a model  →  Compare and export" Foreground="#718096" FontSize="11" Margin="2,22,0,0" TextWrapping="Wrap"/>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

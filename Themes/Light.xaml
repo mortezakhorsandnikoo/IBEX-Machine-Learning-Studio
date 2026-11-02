@@ -1,0 +1,358 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+      IBEX light theme for shared dialogs and controls.
+      All keys are x:Key'd so nothing auto-applies (safe with the navigation Frame).
+      Reference brushes with {DynamicResource Ax...} so a later light/dark swap updates live.
+    -->
+
+    <!-- ===== Palette (colors) ===== -->
+    <Color x:Key="AxInkColor">#FFF4F6FA</Color>
+    <Color x:Key="AxPanelColor">#FFFFFFFF</Color>
+    <Color x:Key="AxRaisedColor">#FFF1F5F9</Color>
+    <Color x:Key="AxHairlineColor">#FFE2E7EF</Color>
+    <Color x:Key="AxCopperColor">#FF087F73</Color>
+    <Color x:Key="AxCopperBrightColor">#FF14988A</Color>
+    <Color x:Key="AxCopperDeepColor">#FF05665D</Color>
+    <Color x:Key="AxOnCopperColor">#FFFFFFFF</Color>
+    <Color x:Key="AxTextColor">#FF172B45</Color>
+    <Color x:Key="AxTextMutedColor">#FF64748B</Color>
+
+    <!-- ===== Brushes (use these in XAML) ===== -->
+    <SolidColorBrush x:Key="AxInk"          Color="{DynamicResource AxInkColor}"/>
+    <SolidColorBrush x:Key="AxPanel"        Color="{DynamicResource AxPanelColor}"/>
+    <SolidColorBrush x:Key="AxRaised"       Color="{DynamicResource AxRaisedColor}"/>
+    <SolidColorBrush x:Key="AxHairline"     Color="{DynamicResource AxHairlineColor}"/>
+    <SolidColorBrush x:Key="AxCopper"       Color="{DynamicResource AxCopperColor}"/>
+    <SolidColorBrush x:Key="AxCopperBright" Color="{DynamicResource AxCopperBrightColor}"/>
+    <SolidColorBrush x:Key="AxCopperDeep"   Color="{DynamicResource AxCopperDeepColor}"/>
+    <SolidColorBrush x:Key="AxOnCopper"     Color="{DynamicResource AxOnCopperColor}"/>
+    <SolidColorBrush x:Key="AxText"         Color="{DynamicResource AxTextColor}"/>
+    <SolidColorBrush x:Key="AxTextMuted"    Color="{DynamicResource AxTextMutedColor}"/>
+
+    <!-- ===== Vector icons (24x24, filled — colour with Fill) ===== -->
+    <Geometry x:Key="IconBanana">M15,3 A9,9 0 1 0 15,21 A7,7 0 1 1 15,3 Z</Geometry>
+    <Geometry x:Key="IconBolt">M13,2 L5,13 L11,13 L10,22 L19,10 L13,10 Z</Geometry>
+    <Geometry x:Key="IconSparkle">M12,2 L14,10 L22,12 L14,14 L12,22 L10,14 L2,12 L10,10 Z</Geometry>
+    <Geometry x:Key="IconIbex">M2,21 L9,7 L13,14 L16,9 L22,21 Z</Geometry>
+    <Geometry x:Key="IconBuilding">M4,21 L4,8 L12,3 L20,8 L20,21 L14,21 L14,15 L10,15 L10,21 Z</Geometry>
+    <Geometry x:Key="IconDrop">M12,3 C7,10 6,13 6,16 A6,6 0 0 0 18,16 C18,13 17,10 12,3 Z</Geometry>
+    <Geometry x:Key="IconUpload">M12,3 L6,10 L10,10 L10,15 L14,15 L14,10 L18,10 Z M4,18 L20,18 L20,21 L4,21 Z</Geometry>
+    <GeometryGroup x:Key="IconCamera" FillRule="EvenOdd">
+        <RectangleGeometry Rect="3,7 18,12" RadiusX="2" RadiusY="2"/>
+        <RectangleGeometry Rect="8,4 6,3"/>
+        <EllipseGeometry Center="12,13" RadiusX="3.4" RadiusY="3.4"/>
+    </GeometryGroup>
+    <GeometryGroup x:Key="IconSun">
+        <EllipseGeometry Center="12,12" RadiusX="5" RadiusY="5"/>
+        <RectangleGeometry Rect="11,1 2,3"/>
+        <RectangleGeometry Rect="11,20 2,3"/>
+        <RectangleGeometry Rect="1,11 3,2"/>
+        <RectangleGeometry Rect="20,11 3,2"/>
+    </GeometryGroup>
+    <GeometryGroup x:Key="IconPerson">
+        <EllipseGeometry Center="12,7" RadiusX="4" RadiusY="4"/>
+        <RectangleGeometry Rect="5,13 14,9" RadiusX="5" RadiusY="5"/>
+    </GeometryGroup>
+    <Geometry x:Key="IconCube">M12,2 L21,7 L21,17 L12,22 L3,17 L3,7 Z</Geometry>
+    <Geometry x:Key="IconSwatch">M4,4 L20,4 L20,20 L4,20 Z M4,13 L9,9 L13,12 L20,7</Geometry>
+
+    <!-- ===== Control styles (keyed — apply explicitly) ===== -->
+
+    <!-- Primary (copper) button -->
+    <Style x:Key="AxButtonPrimary" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource AxCopper}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AxOnCopper}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Padding" Value="16,10"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="8"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource AxCopperBright}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource AxCopperDeep}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Secondary (outline) button -->
+    <Style x:Key="AxButtonGhost" TargetType="Button">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource AxText}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Padding" Value="16,10"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="8"
+                            BorderBrush="{DynamicResource AxHairline}" BorderThickness="1"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource AxRaised}"/>
+                            <Setter TargetName="b" Property="BorderBrush" Value="{DynamicResource AxCopper}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Card / panel -->
+    <Style x:Key="AxCard" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource AxPanel}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource AxHairline}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="18"/>
+    </Style>
+
+    <!-- Dropdown item -->
+    <Style x:Key="AxComboItem" TargetType="ComboBoxItem">
+        <Setter Property="Foreground" Value="{DynamicResource AxText}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Padding" Value="12,9"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border x:Name="b" Background="Transparent" Padding="{TemplateBinding Padding}" CornerRadius="6">
+                        <ContentPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource AxRaised}"/>
+                        </Trigger>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource AxRaised}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Dropdown group header (non-selectable) -->
+    <Style x:Key="AxComboHeader" TargetType="ComboBoxItem">
+        <Setter Property="Foreground" Value="{DynamicResource AxCopper}"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="IsEnabled" Value="False"/>
+        <Setter Property="Padding" Value="12,10,12,4"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border Padding="{TemplateBinding Padding}">
+                        <ContentPresenter/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Dropdown (ComboBox) -->
+    <Style x:Key="AxCombo" TargetType="ComboBox">
+        <Setter Property="Foreground" Value="{DynamicResource AxText}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="ItemContainerStyle" Value="{StaticResource AxComboItem}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <ToggleButton Focusable="False" ClickMode="Press"
+                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border x:Name="bd" Background="{DynamicResource AxRaised}" CornerRadius="8"
+                                            BorderBrush="{DynamicResource AxHairline}" BorderThickness="1" Padding="12,0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ContentPresenter VerticalAlignment="Center"
+                                                TextElement.Foreground="{DynamicResource AxText}"
+                                                Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"/>
+                                            <TextBlock Grid.Column="1" Text="&#x25BE;" Margin="8,0,0,0"
+                                                       Foreground="{DynamicResource AxTextMuted}" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="bd" Property="BorderBrush" Value="{DynamicResource AxCopper}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                        <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom"
+                               AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
+                            <Border Background="{DynamicResource AxPanel}" BorderBrush="{DynamicResource AxHairline}"
+                                    BorderThickness="1" CornerRadius="8" Margin="0,4,0,0" Padding="4"
+                                    MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ScrollViewer MaxHeight="340">
+                                    <ItemsPresenter/>
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Headings / text -->
+    <Style x:Key="AxH1" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource AxText}"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+    <Style x:Key="AxLabel" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource AxTextMuted}"/>
+        <Setter Property="FontSize" Value="13"/>
+    </Style>
+
+    <!-- Multiline text box -->
+    <Style x:Key="AxTextBox" TargetType="TextBox">
+        <Setter Property="Background" Value="{DynamicResource AxRaised}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AxText}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource AxCopper}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource AxHairline}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="8"
+                            BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="bd" Property="BorderBrush" Value="{DynamicResource AxCopper}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Chip: small multi-select pill (ToggleButton) -->
+    <Style x:Key="AxChip" TargetType="ToggleButton">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Margin" Value="0,0,6,6"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="b" Background="{DynamicResource AxRaised}" CornerRadius="14"
+                            BorderBrush="{DynamicResource AxHairline}" BorderThickness="1" Padding="12,6">
+                        <TextBlock x:Name="t" Text="{TemplateBinding Content}" Foreground="{DynamicResource AxText}" FontSize="12"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="b" Property="BorderBrush" Value="{DynamicResource AxCopperBright}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource AxCopper}"/>
+                            <Setter TargetName="b" Property="BorderBrush" Value="{DynamicResource AxCopper}"/>
+                            <Setter TargetName="t" Property="Foreground" Value="{DynamicResource AxOnCopper}"/>
+                            <Setter TargetName="t" Property="FontWeight" Value="SemiBold"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Category row: icon + label, single-select (RadioButton) -->
+    <Style x:Key="AxCatRow" TargetType="RadioButton">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="GroupName" Value="AxCat"/>
+        <Setter Property="Margin" Value="0,0,0,6"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="b" Background="{DynamicResource AxRaised}" CornerRadius="8"
+                            BorderBrush="{DynamicResource AxHairline}" BorderThickness="1" Padding="10,9">
+                        <StackPanel Orientation="Horizontal">
+                            <Path x:Name="ico" Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                  Fill="{DynamicResource AxTextMuted}" Width="18" Height="18" Stretch="Uniform" VerticalAlignment="Center"/>
+                            <TextBlock Text="{TemplateBinding Content}" Foreground="{DynamicResource AxText}"
+                                       FontSize="13" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="b" Property="BorderBrush" Value="{DynamicResource AxCopperBright}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="b" Property="BorderBrush" Value="{DynamicResource AxCopper}"/>
+                            <Setter TargetName="b" Property="BorderThickness" Value="2"/>
+                            <Setter TargetName="ico" Property="Fill" Value="{DynamicResource AxCopper}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Style tile: image slot + name, single-select (RadioButton) -->
+    <Style x:Key="AxStyleTile" TargetType="RadioButton">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Width" Value="100"/>
+        <Setter Property="Margin" Value="0,0,8,8"/>
+        <Setter Property="GroupName" Value="AxStyle"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="b" Background="{DynamicResource AxPanel}" CornerRadius="10"
+                            BorderBrush="{DynamicResource AxHairline}" BorderThickness="1">
+                        <StackPanel>
+                            <Border x:Name="img" Background="{DynamicResource AxInk}" CornerRadius="6"
+                                    Height="74" Margin="6,6,6,4">
+                                <Path x:Name="ico" Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                      Fill="{DynamicResource AxTextMuted}" Width="30" Height="30" Stretch="Uniform"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="{TemplateBinding Content}" Foreground="{DynamicResource AxText}"
+                                       FontSize="12" TextAlignment="Center" TextWrapping="Wrap"
+                                       Margin="6,0,6,8"/>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="b" Property="BorderBrush" Value="{DynamicResource AxCopperBright}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="b" Property="BorderBrush" Value="{DynamicResource AxCopper}"/>
+                            <Setter TargetName="b" Property="BorderThickness" Value="2"/>
+                            <Setter TargetName="ico" Property="Fill" Value="{DynamicResource AxCopper}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
+
