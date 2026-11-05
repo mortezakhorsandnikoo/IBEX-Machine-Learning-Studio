@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use IBEX Machine Learning Studio, please cite it as below."
 title: "IBEX Machine Learning Studio"
 version: 1.0.4
-doi: 10.5281/zenodo.23898834
+doi: 10.5281/zenodo.23982213
 date-released: 2026-11-05
 authors:
   - family-names: "Khorsand Nikoo"
