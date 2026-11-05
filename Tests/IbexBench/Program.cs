@@ -38,6 +38,25 @@ namespace IbexBench
         static StreamWriter Out;
         static readonly List<(string task, string status)> Log = new List<(string, string)>();
 
+        // Extra, heavier configurations for the models whose slider defaults are deliberately light
+        // (application defaults are still run and reported). Values stay inside the slider ranges.
+        // Edit this list to try other settings; the scikit-learn side is then run with the same ones.
+        static readonly (string label, RegModelType type, string cfg, (string name, double value)[] over)[] ExtraRegCfgs =
+        {
+            ("MLP", RegModelType.MLP, "epochs=1000;lr=0.01", new[] { ("epochs", 1000.0), ("learningRate", 0.01) }),
+            ("MLP", RegModelType.MLP, "epochs=1000;lr=0.05", new[] { ("epochs", 1000.0), ("learningRate", 0.05) }),
+            ("Online GD", RegModelType.OGD, "it=500;lr=0.1", new[] { ("iterations", 500.0), ("learningRate", 0.1) }),
+            ("Online GD", RegModelType.OGD, "it=500;lr=0.3", new[] { ("iterations", 500.0), ("learningRate", 0.3) }),
+        };
+
+        // Extra configuration for the classifier whose slider defaults diverge on Digits (ANN).
+        static readonly (string label, ClassifierType type, string cfg, int iters, double lr)[] ExtraClsCfgs =
+        {
+            ("ANN (MLP)", ClassifierType.ANN, "it=500;lr=0.01", 500, 0.01),
+            ("ANN (MLP)", ClassifierType.ANN, "it=500;lr=0.03", 500, 0.03),
+            ("ANN (MLP)", ClassifierType.ANN, "it=1000;lr=0.01", 1000, 0.01),
+        };
+
         static readonly (string name, string file)[] RegData =
         {
             ("Diabetes", "reg_diabetes.csv"),
@@ -166,11 +185,18 @@ namespace IbexBench
                 var mm = m;
                 Run("regression", name, mm.label, "default", () => CrossValidateInterfaceModel(ds, target, mm.type));
             }
+
+            // 4) Extra configurations (MLP and online gradient descent)
+            foreach (var e in ExtraRegCfgs)
+            {
+                var ee = e;
+                Run("regression", name, ee.label, ee.cfg, () => CrossValidateInterfaceModel(ds, target, ee.type, ee.over));
+            }
         }
 
         // Reproduces MLView.AdvCompute: DatasetBuilder.Shuffle(n) (seed 42), contiguous folds,
         // slider-default hyperparameters. Features and target are z-scored first (like Prepare > ZScore).
-        static Res CrossValidateInterfaceModel(MLDataset ds, int target, RegModelType type)
+        static Res CrossValidateInterfaceModel(MLDataset ds, int target, RegModelType type, (string name, double value)[] over = null)
         {
             DatasetBuilder.Build(ds, target, out float[][] X, out float[] y, out string[] names);
             double[] ys = ZScore(X, y);                         // [mean, std] of the target
@@ -182,6 +208,7 @@ namespace IbexBench
             for (int f = 0; f < K; f++) { int sz = bs + (f < rem ? 1 : 0); parts.Add(idx.Skip(pos).Take(sz).ToArray()); pos += sz; }
 
             var hyper = RegModelInfo.Hyper(type).ToDictionary(h => h.Name, h => h.Default);
+            if (over != null) foreach (var o in over) hyper[o.name] = o.value;
             var r2 = new List<double>(); var rmse = new List<double>();
             for (int f = 0; f < K; f++)
             {
@@ -224,6 +251,20 @@ namespace IbexBench
                 Run("classification", name, mm.label, "default", () =>
                 {
                     var eng = new ClassificationEngine { Type = mm.type };   // application defaults
+                    var cv = eng.CrossValidate(ds, target, feat, K);
+                    double[] acc = cv.FoldAccuracy.Select(Norm01).ToArray();
+                    double[] f1 = cv.FoldF1.Select(Norm01).ToArray();
+                    double pred = cv.FinalModel.Predict(x0);
+                    return new Res { Mean = acc.Average(), Std = PopStd(acc), Second = f1.Average(), PredictOk = IsFinite(pred) };
+                });
+            }
+
+            foreach (var e in ExtraClsCfgs)
+            {
+                var ee = e;
+                Run("classification", name, ee.label, ee.cfg, () =>
+                {
+                    var eng = new ClassificationEngine { Type = ee.type, Iterations = ee.iters, LearningRate = ee.lr };
                     var cv = eng.CrossValidate(ds, target, feat, K);
                     double[] acc = cv.FoldAccuracy.Select(Norm01).ToArray();
                     double[] f1 = cv.FoldF1.Select(Norm01).ToArray();
