@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Place this folder at  MLStudio\Tests\IbexBench\  (the application's csproj already excludes Tests/**). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <PlatformTarget>x64</PlatformTarget>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>IbexBench</RootNamespace>
+    <AssemblyName>IbexBench</AssemblyName>
+    <NoWarn>$(NoWarn);CS0168;CS0219;CS0649;CS0414;CS8632;SYSLIB0011</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- the real ML engines, linked (not copied), so the harness always tests the current code -->
+    <Compile Include="..\..\ML\**\*.cs" LinkBase="ML" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML.FastTree" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML.LightGbm" Version="5.0.0" />
+    <PackageReference Include="XGBoostSharp-cpu" Version="0.5.29" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="data\**\*" CopyToOutputDirectory="PreserveNewest" LinkBase="data" />
+  </ItemGroup>
+
+</Project>

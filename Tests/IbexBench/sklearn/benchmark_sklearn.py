@@ -21,6 +21,7 @@ from sklearn.neural_network import MLPRegressor, MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 from sklearn.metrics import (r2_score, mean_squared_error, accuracy_score, f1_score,
@@ -49,26 +50,26 @@ def reg_models():
         "Random Forest": RandomForestRegressor(n_estimators=50, max_depth=12, min_samples_leaf=10, random_state=SEED),
         "MLP": MLPRegressor(hidden_layer_sizes=(32,), max_iter=200, learning_rate_init=1e-3, random_state=SEED),
         "RBF surrogate": KernelRidge(kernel="rbf", gamma=1.0, alpha=1e-3),
-        "FastTree-like (GBM)": GradientBoostingRegressor(n_estimators=100, learning_rate=0.2, random_state=SEED),
-        "Online GD": SGDRegressor(random_state=SEED, max_iter=1000),
+        "FastTree-like (GBM)": GradientBoostingRegressor(n_estimators=100, learning_rate=0.2, max_leaf_nodes=31, min_samples_leaf=10, random_state=SEED),
+        "Online GD": SGDRegressor(max_iter=50, eta0=0.01, learning_rate="constant", tol=None, random_state=SEED),
     }
-    if LGBMRegressor: m["LightGBM"] = LGBMRegressor(n_estimators=100, learning_rate=0.2, verbose=-1, random_state=SEED)
-    if XGBRegressor: m["XGBoost"] = XGBRegressor(n_estimators=100, learning_rate=0.2, random_state=SEED, verbosity=0)
+    if LGBMRegressor: m["LightGBM"] = LGBMRegressor(n_estimators=200, learning_rate=0.1, num_leaves=31, min_child_samples=10, verbose=-1, random_state=SEED)
+    if XGBRegressor: m["XGBoost"] = XGBRegressor(n_estimators=200, learning_rate=0.1, max_depth=6, subsample=0.8, random_state=SEED, verbosity=0)
     return {k: v for k, v in m.items() if v is not None}
 
 
 def cls_models():
     m = {
-        "Logistic Regression": LogisticRegression(max_iter=2000),
+        "Logistic Regression (OvR)": OneVsRestClassifier(LogisticRegression(max_iter=2000)),
         "KNN (k=5)": KNeighborsClassifier(n_neighbors=5),
         "Naive Bayes": GaussianNB(),
-        "SVM (RBF)": SVC(random_state=SEED),
-        "Random Forest": RandomForestClassifier(n_estimators=50, max_depth=12, min_samples_leaf=1, random_state=SEED),
-        "FastTree-like (GBM)": GradientBoostingClassifier(n_estimators=100, learning_rate=0.2, random_state=SEED),
+        "SVM (linear, OvR)": OneVsRestClassifier(SVC(kernel="linear", C=1.0)),
+        "Random Forest": RandomForestClassifier(n_estimators=50, max_depth=12, min_samples_leaf=5, random_state=SEED),
+        "FastTree-like (GBM)": GradientBoostingClassifier(n_estimators=50, learning_rate=0.1, max_leaf_nodes=24, min_samples_leaf=5, random_state=SEED),
         "ANN (MLP)": MLPClassifier(hidden_layer_sizes=(32,), max_iter=500, random_state=SEED),
     }
-    if LGBMClassifier: m["LightGBM"] = LGBMClassifier(n_estimators=100, learning_rate=0.2, verbose=-1, random_state=SEED)
-    if XGBClassifier: m["XGBoost"] = XGBClassifier(n_estimators=100, learning_rate=0.2, random_state=SEED, verbosity=0)
+    if LGBMClassifier: m["LightGBM"] = LGBMClassifier(n_estimators=50, learning_rate=0.1, num_leaves=24, min_child_samples=5, verbose=-1, random_state=SEED)
+    if XGBClassifier: m["XGBoost"] = XGBClassifier(n_estimators=50, learning_rate=0.1, max_depth=12, random_state=SEED, verbosity=0)
     return m
 
 

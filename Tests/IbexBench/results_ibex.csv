@@ -1,0 +1,97 @@
+task,dataset,algorithm,config,score_mean,score_std,score2,silhouette,ari,n_clusters,seconds,predict_ok,status
+regression,Diabetes,Linear (no reg.),default,-3.9056171,0.46226926,169.46121,,,-1,0.160,yes,OK
+regression,Diabetes,Linear (L1),default,-3.9056229,0.46226993,169.46131,,,-1,0.120,yes,OK
+regression,Diabetes,Linear (L2),default,-3.9056198,0.46226955,169.46125,,,-1,0.103,yes,OK
+regression,Diabetes,Linear (no reg.),converged,0.461847,0.062343094,56.097224,,,-1,0.925,yes,OK
+regression,Diabetes,Linear (L1),converged,0.46189668,0.062299895,56.094782,,,-1,0.704,yes,OK
+regression,Diabetes,Linear (L2),converged,0.46386396,0.06103584,55.998398,,,-1,0.662,yes,OK
+regression,Diabetes,Polynomial (deg 2),lr=0.05;it=3000,0.48842494,0.053897698,54.698456,,,-1,0.325,yes,OK
+regression,Diabetes,Normal Equation,default,0.4829386,0.052660746,55.019357,,,-1,0.009,yes,OK
+regression,Diabetes,Locally Weighted Reg.,default,0.34232876,0.01277429,62.181609,,,-1,0.068,yes,OK
+regression,Diabetes,Random Forest,default,0.39862175,0.04981041,59.361297,,,-1,0.247,yes,OK
+regression,Diabetes,MLP,default,0.062611965,0.069655773,74.130944,,,-1,0.575,yes,OK
+regression,Diabetes,RBF surrogate,default,0.17941516,0.038413134,69.451989,,,-1,0.085,yes,OK
+regression,Diabetes,FastTree-like (GBM),default,0.30629318,0.055204957,63.771066,,,-1,0.900,yes,OK
+regression,Diabetes,LightGBM,default,0.31435043,0.038536564,63.462712,,,-1,0.878,yes,OK
+regression,Diabetes,Online GD,default,0.21384148,0.013603399,67.995753,,,-1,0.287,yes,OK
+regression,Diabetes,XGBoost,default,0.3074751,0.047021021,63.750816,,,-1,2.048,yes,OK
+regression,Friedman1,Linear (no reg.),default,-7.0571936,0.97484912,14.326549,,,-1,0.052,yes,OK
+regression,Friedman1,Linear (L1),default,-7.0577266,0.97505113,14.327006,,,-1,0.048,yes,OK
+regression,Friedman1,Linear (L2),default,-7.0574375,0.97486113,14.326768,,,-1,0.033,yes,OK
+regression,Friedman1,Linear (no reg.),converged,0.73722453,0.032774161,2.5913708,,,-1,0.116,yes,OK
+regression,Friedman1,Linear (L1),converged,0.73744004,0.032251269,2.5907745,,,-1,0.113,yes,OK
+regression,Friedman1,Linear (L2),converged,0.73735475,0.031064901,2.5920203,,,-1,0.104,yes,OK
+regression,Friedman1,Polynomial (deg 2),lr=0.05;it=3000,0.87761641,0.016985556,1.7671403,,,-1,0.362,yes,OK
+regression,Friedman1,Normal Equation,default,0.73779361,0.031015735,2.5894241,,,-1,0.002,yes,OK
+regression,Friedman1,Locally Weighted Reg.,default,0.78147721,0.033281133,2.3592822,,,-1,0.089,yes,OK
+regression,Friedman1,Random Forest,default,0.63272543,0.01876812,3.077622,,,-1,0.199,yes,OK
+regression,Friedman1,MLP,default,-0.12036507,0.084793169,5.3613644,,,-1,0.625,yes,OK
+regression,Friedman1,RBF surrogate,default,0.062900235,0.007712428,4.9199344,,,-1,0.110,yes,OK
+regression,Friedman1,FastTree-like (GBM),default,0.86020356,0.032304325,1.8868406,,,-1,0.519,yes,OK
+regression,Friedman1,LightGBM,default,0.86837886,0.027934219,1.8329132,,,-1,0.819,yes,OK
+regression,Friedman1,Online GD,default,0.1621534,0.0071924728,4.6526057,,,-1,0.187,yes,OK
+regression,Friedman1,XGBoost,default,0.84016662,0.021579143,2.0248415,,,-1,0.590,yes,OK
+regression,Synthetic-linear,Linear (no reg.),default,-0.003436975,0.021134229,166.21351,,,-1,0.038,yes,OK
+regression,Synthetic-linear,Linear (L1),default,-0.0034368203,0.021134425,166.2135,,,-1,0.039,yes,OK
+regression,Synthetic-linear,Linear (L2),default,-0.0034371726,0.021134272,166.21353,,,-1,0.030,yes,OK
+regression,Synthetic-linear,Linear (no reg.),converged,0.99581144,0.00062985289,10.661786,,,-1,0.318,yes,OK
+regression,Synthetic-linear,Linear (L1),converged,0.99581304,0.00062907999,10.65984,,,-1,0.277,yes,OK
+regression,Synthetic-linear,Linear (L2),converged,0.99540589,0.0005523458,11.1925,,,-1,0.275,yes,OK
+regression,Synthetic-linear,Polynomial (deg 2),lr=0.05;it=3000,0.9957594,0.00080630417,10.708664,,,-1,0.218,yes,OK
+regression,Synthetic-linear,Normal Equation,default,0.99581253,0.00062742371,10.660625,,,-1,0.001,yes,OK
+regression,Synthetic-linear,Locally Weighted Reg.,default,0.99458514,0.0010149514,12.119157,,,-1,0.031,yes,OK
+regression,Synthetic-linear,Random Forest,default,0.63643683,0.036188159,100.07103,,,-1,0.087,yes,OK
+regression,Synthetic-linear,MLP,default,0.39765509,0.063050148,128.56425,,,-1,0.391,yes,OK
+regression,Synthetic-linear,RBF surrogate,default,0.24375918,0.030792912,144.34653,,,-1,0.050,yes,OK
+regression,Synthetic-linear,FastTree-like (GBM),default,0.89081686,0.0097043668,54.62458,,,-1,0.198,yes,OK
+regression,Synthetic-linear,LightGBM,default,0.9042372,0.0073699678,51.26447,,,-1,0.788,yes,OK
+regression,Synthetic-linear,Online GD,default,0.22226032,0.020942411,146.37789,,,-1,0.086,yes,OK
+regression,Synthetic-linear,XGBoost,default,0.84713772,0.045521356,63.668213,,,-1,0.822,yes,OK
+classification,Iris,Logistic Regression (OvR),default,0.89333333,0.064635731,0.8927755,,,-1,0.024,yes,OK
+classification,Iris,KNN (k=5),default,0.96,0.048989795,0.96168664,,,-1,0.020,yes,OK
+classification,Iris,Naive Bayes,default,0.95333333,0.033993463,0.95356989,,,-1,0.001,yes,OK
+classification,Iris,SVM (linear; OvR),default,0.91333333,0.045215533,0.91316855,,,-1,0.011,yes,OK
+classification,Iris,Random Forest,default,0.94666667,0.049888765,0.94854183,,,-1,0.027,yes,OK
+classification,Iris,FastTree-like (GBM),default,0.95333333,0.049888765,0.95532647,,,-1,0.791,yes,OK
+classification,Iris,LightGBM,default,0.93333333,0.047140452,0.93354282,,,-1,0.762,yes,OK
+classification,Iris,XGBoost,default,0.95333333,0.045215533,0.95345453,,,-1,0.523,yes,OK
+classification,Iris,ANN (MLP),default,0.96666667,0.02981424,0.96805374,,,-1,0.646,yes,OK
+classification,Wine,Logistic Regression (OvR),default,0.9831746,0.013740935,0.98215696,,,-1,0.024,yes,OK
+classification,Wine,KNN (k=5),default,0.96634921,0.021133179,0.96579033,,,-1,0.014,yes,OK
+classification,Wine,Naive Bayes,default,0.96634921,0.010958131,0.96660957,,,-1,0.007,yes,OK
+classification,Wine,SVM (linear; OvR),default,0.96634921,0.020705618,0.96536821,,,-1,0.018,yes,OK
+classification,Wine,Random Forest,default,0.97746032,0.021299435,0.97611018,,,-1,0.018,yes,OK
+classification,Wine,FastTree-like (GBM),default,0.96095238,0.028267341,0.95959786,,,-1,0.859,yes,OK
+classification,Wine,LightGBM,default,0.97206349,0.030430687,0.97086243,,,-1,0.574,yes,OK
+classification,Wine,XGBoost,default,0.9552381,0.028459215,0.95405472,,,-1,0.574,yes,OK
+classification,Wine,ANN (MLP),default,0.97190476,0.02520563,0.97059015,,,-1,0.942,yes,OK
+classification,Breast Cancer,Logistic Regression (OvR),default,0.98244061,0.0078285368,0.98084206,,,-1,0.087,yes,OK
+classification,Breast Cancer,KNN (k=5),default,0.96660456,0.014043398,0.9637026,,,-1,0.066,yes,OK
+classification,Breast Cancer,Naive Bayes,default,0.92971588,0.025985997,0.92464838,,,-1,0.002,yes,OK
+classification,Breast Cancer,SVM (linear; OvR),default,0.9648657,0.01105922,0.96216762,,,-1,0.059,yes,OK
+classification,Breast Cancer,Random Forest,default,0.95609377,0.011022215,0.95274395,,,-1,0.071,yes,OK
+classification,Breast Cancer,FastTree-like (GBM),default,0.95430834,0.01402624,0.95097422,,,-1,1.082,yes,OK
+classification,Breast Cancer,LightGBM,default,0.97012886,0.0089278467,0.96771425,,,-1,0.766,yes,OK
+classification,Breast Cancer,XGBoost,default,0.96308027,0.0086592435,0.96046072,,,-1,1.082,yes,OK
+classification,Breast Cancer,ANN (MLP),default,0.97711535,0.014367744,0.97552948,,,-1,5.187,yes,OK
+classification,Digits,Logistic Regression (OvR),default,0.94768493,0.0073847868,0.94685052,,,-1,2.782,yes,OK
+classification,Digits,KNN (k=5),default,0.97328227,0.0051922404,0.97305955,,,-1,1.145,yes,OK
+classification,Digits,Naive Bayes,default,0.84529867,0.0088789905,0.84425582,,,-1,0.039,yes,OK
+classification,Digits,SVM (linear; OvR),default,0.94378521,0.0097609182,0.94312866,,,-1,2.431,yes,OK
+classification,Digits,Random Forest,default,0.96048747,0.0093915531,0.9599183,,,-1,0.457,yes,OK
+classification,Digits,FastTree-like (GBM),default,0.96104302,0.0050055655,0.96077714,,,-1,3.900,yes,OK
+classification,Digits,LightGBM,default,0.97050139,0.012414549,0.96996005,,,-1,2.918,yes,OK
+classification,Digits,XGBoost,default,0.95325441,0.015600505,0.95310808,,,-1,4.459,yes,OK
+classification,Digits,ANN (MLP),default,0.099048282,0.019466614,0.01796631,,,-1,34.219,yes,OK
+clustering,Iris,K-Means,default,,,,0.45937792,0.61007285,3,0.008,yes,OK
+clustering,Iris,DBSCAN,default,,,,0.58175005,0.56811594,2,0.002,yes,OK
+clustering,Iris,Hierarchical (average),default,,,,0.48026693,0.56213643,3,0.065,yes,OK
+clustering,Iris,Fuzzy C-Means,default,,,,0.45844172,0.63033933,3,0.008,yes,OK
+clustering,Wine,K-Means,default,,,,0.28485892,0.89749498,3,0.005,yes,OK
+clustering,Wine,DBSCAN,default,,,,0,0,0,0.004,yes,OK
+clustering,Wine,Hierarchical (average),default,,,,0.15841524,-0.0054419733,3,0.136,yes,OK
+clustering,Wine,Fuzzy C-Means,default,,,,0.28485892,0.89749498,3,0.005,yes,OK
+clustering,Breast Cancer,K-Means,default,,,,0.34338224,0.6536246,2,0.010,yes,OK
+clustering,Breast Cancer,DBSCAN,default,,,,0,-0.02269398,1,0.006,yes,OK
+clustering,Breast Cancer,Hierarchical (average),default,,,,0.63397822,0.0072761828,2,1.233,yes,OK
+clustering,Breast Cancer,Fuzzy C-Means,default,,,,0.33997145,0.68286491,2,0.016,yes,OK
