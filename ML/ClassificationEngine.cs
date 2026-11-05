@@ -413,6 +413,7 @@ namespace ArchiAI.ML
                 ? ml.MulticlassClassification.Trainers.LightGbm(labelColumnName: "LabelKey", featureColumnName: "Features")
                 : ml.MulticlassClassification.Trainers.OneVersusAll(
                     ml.BinaryClassification.Trainers.FastTree(
+                        labelColumnName: "LabelKey",
                         numberOfLeaves: Math.Max(2, MaxDepth * 2), numberOfTrees: Trees,
                         minimumExampleCountPerLeaf: MinLeaf, learningRate: LearningRate),
                     labelColumnName: "LabelKey");
