@@ -85,13 +85,19 @@
             <Border Background="White" BorderBrush="#E2E7EF" BorderThickness="0,0,0,1" Padding="28,16">
                 <DockPanel>
                     <Button DockPanel.Dock="Right" Content="Help · F1" Click="Help_Click" Foreground="#087F73" Background="White" BorderBrush="#D9E5E2" Padding="12,7" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                    <Button DockPanel.Dock="Right" x:Name="ZoomResetButton" Content="100%" Click="ZoomReset_Click" Foreground="#64748B" Background="White" BorderBrush="#D9E5E2" Padding="10,7" VerticalAlignment="Center" Margin="12,0,0,0"
+                            ToolTip="Page zoom. Ctrl + mouse wheel (or Ctrl + plus / minus) zooms; click or press Ctrl + 0 to reset."/>
                     <StackPanel>
                         <TextBlock x:Name="SectionTitle" Text="Welcome to your studio" FontSize="22" FontWeight="SemiBold" Foreground="#172B45"/>
                         <TextBlock x:Name="SectionSubtitle" Text="A clear path from data to discovery." Foreground="#64748B" Margin="0,5,14,0"/>
                     </StackPanel>
                 </DockPanel>
             </Border>
-            <Frame Grid.Row="1" x:Name="MainFrame" NavigationUIVisibility="Hidden" Background="Transparent"/>
+            <Frame Grid.Row="1" x:Name="MainFrame" NavigationUIVisibility="Hidden" Background="Transparent">
+                <Frame.LayoutTransform>
+                    <ScaleTransform x:Name="PageZoom" ScaleX="1" ScaleY="1"/>
+                </Frame.LayoutTransform>
+            </Frame>
         </Grid>
     </Grid>
 </Window>

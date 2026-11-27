@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace ArchiAI
 {
@@ -28,7 +29,45 @@ namespace ArchiAI
             _welcome.OpenSection += ShowSection;
             ShowSection(-1);
             PreviewKeyDown += (_, e) => { if (e.Key == System.Windows.Input.Key.F1) { OpenHelp(); e.Handled = true; } };
+            PreviewKeyDown += ZoomKeys;
+            PreviewMouseWheel += ZoomWheel;
         }
+
+        // ---- Page zoom: Ctrl + mouse wheel, Ctrl + plus/minus, Ctrl + 0 ----
+        // Scales every page (Home, workspace pages, Help) like browser zoom; the layout reflows
+        // so panels keep fitting the window and scroll where needed.
+        private const double MinZoom = 0.5, MaxZoom = 2.5, ZoomStep = 0.1;
+
+        public double Zoom => PageZoom.ScaleX;
+
+        public void SetZoom(double zoom)
+        {
+            zoom = Math.Round(Math.Clamp(zoom, MinZoom, MaxZoom), 2);
+            PageZoom.ScaleX = PageZoom.ScaleY = zoom;
+            ZoomResetButton.Content = $"{zoom * 100:0}%";
+        }
+
+        private void ZoomWheel(object sender, MouseWheelEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == 0) return;
+            SetZoom(Zoom + Math.Sign(e.Delta) * ZoomStep);
+            e.Handled = true; // keep charts and scroll views from also reacting
+        }
+
+        private void ZoomKeys(object sender, KeyEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == 0) return;
+            switch (e.Key)
+            {
+                case Key.OemPlus: case Key.Add: SetZoom(Zoom + ZoomStep); break;
+                case Key.OemMinus: case Key.Subtract: SetZoom(Zoom - ZoomStep); break;
+                case Key.D0: case Key.NumPad0: SetZoom(1); break;
+                default: return;
+            }
+            e.Handled = true;
+        }
+
+        private void ZoomReset_Click(object sender, RoutedEventArgs e) => SetZoom(1);
 
         private Views.MLView Workspace => _workspace ??= new Views.MLView();
 
