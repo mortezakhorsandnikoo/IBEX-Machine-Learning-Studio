@@ -53,6 +53,49 @@ namespace ArchiAI.ML
         }
     }
 
+    // Full agglomerative merge tree (SciPy-style): leaves are 0..N-1, merge i creates node N+i.
+    public class Dendrogram
+    {
+        public int N { get; set; }
+        public string Linkage { get; set; }
+        public int[] Left { get; set; }
+        public int[] Right { get; set; }
+        public double[] Height { get; set; }   // non-decreasing for single/average/complete linkage
+        public int[] Size { get; set; }
+        public int[] LeafOrder { get; set; }   // left-to-right leaf order for drawing
+
+        // Number of clusters left when the tree is cut just above `height`.
+        public int ClustersAtHeight(double height) => N - Height.Count(h => h <= height);
+
+        // Cut height that leaves exactly k clusters (midway between the two relevant merges).
+        public double CutHeight(int k)
+        {
+            k = Math.Max(1, Math.Min(k, N));
+            int merges = N - k;                       // merges applied
+            double below = merges > 0 ? Height[merges - 1] : 0;
+            double above = merges < Height.Length ? Height[merges] : below + Math.Max(1e-9, below * 0.05);
+            return (below + above) / 2;
+        }
+
+        // Cluster label per leaf after applying the first N-k merges.
+        public int[] Cut(int k)
+        {
+            k = Math.Max(1, Math.Min(k, N));
+            var parent = Enumerable.Range(0, 2 * N - 1).ToArray();
+            int Find(int x) { while (parent[x] != x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; }
+            for (int i = 0; i < N - k; i++) { parent[Find(Left[i])] = N + i; parent[Find(Right[i])] = N + i; }
+            var ids = new Dictionary<int, int>();
+            var labels = new int[N];
+            foreach (int leaf in LeafOrder.Length == N ? LeafOrder : Enumerable.Range(0, N).ToArray())
+            {
+                int root = Find(leaf);
+                if (!ids.TryGetValue(root, out int id)) ids[root] = id = ids.Count;
+                labels[leaf] = id;
+            }
+            return labels;
+        }
+    }
+
     public class ClusteringEngine
     {
         public ClustererType Type { get; set; } = ClustererType.KMeans;
@@ -64,27 +107,38 @@ namespace ArchiAI.ML
         public string Linkage { get; set; } = "average"; // "single" | "average" | "complete"
         public int Seed { get; set; } = 42;
 
-        public ClusterResult Run(MLDataset ds)
+        // Optional tree from BuildDendrogram on the same data/linkage, reused by Hierarchical runs.
+        public Dendrogram Precomputed { get; set; }
+
+        // Largest row count for the hierarchical tree (O(n^2) memory, O(n^3) time).
+        public const int MaxHierarchicalRows = 2000;
+
+        // Column-wise standardization shared by training, the elbow curve and the dendrogram.
+        public static double[][] Standardize(MLDataset ds, out double[] mean, out double[] std)
         {
             int n = ds.RowCount, m = ds.ColCount;
-            var X = new double[n][];
-            for (int i = 0; i < n; i++) { X[i] = new double[m]; for (int j = 0; j < m; j++) X[i][j] = ds.Rows[i][j]; }
-            // standardize
-            var mean = new double[m]; var std = new double[m];
+            mean = new double[m]; std = new double[m];
             for (int j = 0; j < m; j++)
             {
-                double mu = 0; for (int i = 0; i < n; i++) mu += X[i][j]; mu /= n;
-                double s = 0; for (int i = 0; i < n; i++) { double d = X[i][j] - mu; s += d * d; }
+                double mu = 0; for (int i = 0; i < n; i++) mu += ds.Rows[i][j]; mu /= n;
+                double s = 0; for (int i = 0; i < n; i++) { double d = ds.Rows[i][j] - mu; s += d * d; }
                 s = Math.Sqrt(s / n); if (s == 0) s = 1e-8;
                 mean[j] = mu; std[j] = s;
             }
             var Z = new double[n][];
-            for (int i = 0; i < n; i++) { Z[i] = new double[m]; for (int j = 0; j < m; j++) Z[i][j] = (X[i][j] - mean[j]) / std[j]; }
+            for (int i = 0; i < n; i++) { Z[i] = new double[m]; for (int j = 0; j < m; j++) Z[i][j] = (ds.Rows[i][j] - mean[j]) / std[j]; }
+            return Z;
+        }
+
+        public ClusterResult Run(MLDataset ds)
+        {
+            int n = ds.RowCount;
+            var Z = Standardize(ds, out var mean, out var std);
 
             int[] labels; double[][] centroids = null;
             switch (Type)
             {
-                case ClustererType.KMeans: labels = KMeansRun(Z, out centroids); break;
+                case ClustererType.KMeans: labels = KMeansRun(Z, K, Seed, out centroids); break;
                 case ClustererType.Fuzzy: labels = FuzzyRun(Z, out centroids); break;
                 case ClustererType.DBSCAN: labels = DbscanRun(Z); break;
                 default: labels = HierarchicalRun(Z); break;
@@ -110,10 +164,10 @@ namespace ArchiAI.ML
         private static double Dist2(double[] a, double[] b) { double s = 0; for (int j = 0; j < a.Length; j++) { double d = a[j] - b[j]; s += d * d; } return s; }
 
         // ---- K-Means (Lloyd) ----
-        private int[] KMeansRun(double[][] Z, out double[][] centroids)
+        private int[] KMeansRun(double[][] Z, int kWanted, int seed, out double[][] centroids)
         {
-            int n = Z.Length, m = Z[0].Length, k = Math.Max(1, Math.Min(K, n));
-            var rng = new Random(Seed);
+            int n = Z.Length, m = Z[0].Length, k = Math.Max(1, Math.Min(kWanted, n));
+            var rng = new Random(seed);
             centroids = new double[k][];
             var chosen = Enumerable.Range(0, n).OrderBy(_ => rng.Next()).Take(k).ToArray();
             for (int c = 0; c < k; c++) centroids[c] = (double[])Z[chosen[c]].Clone();
@@ -196,37 +250,95 @@ namespace ArchiAI.ML
             return labels;
         }
 
-        // ---- Agglomerative hierarchical (until K clusters) ----
+        // ---- Elbow method: within-cluster sum of squares for k = 1..kMax ----
+        // Each k keeps the best of several K-Means starts so the curve is smooth and repeatable.
+        public (int k, double wcss)[] ElbowCurve(MLDataset ds, int kMax, int restarts = 5)
+        {
+            var Z = Standardize(ds, out _, out _);
+            int top = Math.Max(1, Math.Min(kMax, Z.Length));
+            var curve = new (int, double)[top];
+            for (int k = 1; k <= top; k++)
+            {
+                double best = double.MaxValue;
+                for (int r = 0; r < restarts; r++)
+                {
+                    var labels = KMeansRun(Z, k, Seed + r, out var centroids);
+                    double w = 0; for (int i = 0; i < Z.Length; i++) w += Dist2(Z[i], centroids[labels[i]]);
+                    best = Math.Min(best, w);
+                }
+                curve[k - 1] = (k, best);
+            }
+            return curve;
+        }
+
+        // Suggested elbow: the point farthest from the straight line joining the curve's ends.
+        public static int SuggestElbow((int k, double wcss)[] curve)
+        {
+            if (curve.Length < 3) return curve.Length > 0 ? curve[^1].k : 1;
+            double x1 = curve[0].k, y1 = curve[0].wcss, x2 = curve[^1].k, y2 = curve[^1].wcss;
+            double xr = x2 - x1, yr = Math.Abs(y1 - y2) < 1e-12 ? 1 : y1 - y2;
+            int best = curve[0].k; double bd = -1;
+            foreach (var (k, w) in curve)
+            {
+                double x = (k - x1) / xr, y = (y1 - w) / yr;     // normalized to the unit square
+                double d = Math.Abs(y - x) / Math.Sqrt(2);
+                if (d > bd) { bd = d; best = k; }
+            }
+            return best;
+        }
+
+        // ---- Agglomerative hierarchical: full tree via Lance-Williams updates ----
+        public Dendrogram BuildDendrogram(MLDataset ds) => BuildDendrogram(Standardize(ds, out _, out _));
+
+        private Dendrogram BuildDendrogram(double[][] Z)
+        {
+            int n = Z.Length;
+            if (n > MaxHierarchicalRows)
+                throw new InvalidOperationException($"Hierarchical clustering supports up to {MaxHierarchicalRows} rows; this dataset has {n}.");
+            string link = Linkage == "single" || Linkage == "complete" ? Linkage : "average";
+            var D = new double[n][];
+            for (int i = 0; i < n; i++) { D[i] = new double[n]; for (int j = 0; j < i; j++) D[i][j] = D[j][i] = Math.Sqrt(Dist2(Z[i], Z[j])); }
+            var active = new List<int>(Enumerable.Range(0, n));
+            var nodeOf = Enumerable.Range(0, n).ToArray();   // row/col slot -> tree node id
+            var size = Enumerable.Repeat(1, n).ToArray();
+            int merges = Math.Max(0, n - 1);
+            var tree = new Dendrogram { N = n, Linkage = link, Left = new int[merges], Right = new int[merges], Height = new double[merges], Size = new int[merges] };
+            for (int step = 0; step < merges; step++)
+            {
+                int a = -1, b = -1; double bd = double.MaxValue;
+                for (int x = 0; x < active.Count; x++)
+                    for (int y = x + 1; y < active.Count; y++)
+                    { double d = D[active[x]][active[y]]; if (d < bd) { bd = d; a = active[x]; b = active[y]; } }
+                foreach (int k in active)
+                {
+                    if (k == a || k == b) continue;
+                    double da = D[k][a], db = D[k][b];
+                    double nd = link == "single" ? Math.Min(da, db) : link == "complete" ? Math.Max(da, db)
+                        : (size[a] * da + size[b] * db) / (size[a] + size[b]);
+                    D[k][a] = D[a][k] = nd;
+                }
+                tree.Left[step] = nodeOf[a]; tree.Right[step] = nodeOf[b];
+                tree.Height[step] = bd; size[a] += size[b]; tree.Size[step] = size[a];
+                nodeOf[a] = n + step; active.Remove(b);
+            }
+            // Leaf order: iterative depth-first walk from the root.
+            var order = new List<int>(n);
+            var stack = new Stack<int>(); if (n > 0) stack.Push(n > 1 ? 2 * n - 2 : 0);
+            while (stack.Count > 0)
+            {
+                int node = stack.Pop();
+                if (node < n) { order.Add(node); continue; }
+                stack.Push(tree.Right[node - n]); stack.Push(tree.Left[node - n]);
+            }
+            tree.LeafOrder = order.ToArray();
+            return tree;
+        }
+
         private int[] HierarchicalRun(double[][] Z)
         {
-            int n = Z.Length, k = Math.Max(1, Math.Min(K, n));
-            var members = new List<List<int>>();
-            for (int i = 0; i < n; i++) members.Add(new List<int> { i });
-            double ClusterDist(List<int> a, List<int> b)
-            {
-                double best = Linkage == "complete" ? double.MinValue : double.MaxValue, sum = 0; int cc = 0;
-                foreach (var i in a) foreach (var j in b)
-                {
-                    double d = Math.Sqrt(Dist2(Z[i], Z[j]));
-                    if (Linkage == "single") best = Math.Min(best, d);
-                    else if (Linkage == "complete") best = Math.Max(best, d);
-                    else { sum += d; cc++; }
-                }
-                return Linkage == "average" ? (cc > 0 ? sum / cc : 0) : best;
-            }
-            while (members.Count > k)
-            {
-                int ai = 0, bi = 1; double bd = double.MaxValue;
-                for (int i = 0; i < members.Count; i++)
-                    for (int j = i + 1; j < members.Count; j++)
-                    { double d = ClusterDist(members[i], members[j]); if (d < bd) { bd = d; ai = i; bj_set(ref bi, j); } }
-                members[ai].AddRange(members[bi]); members.RemoveAt(bi);
-            }
-            var labels = new int[n];
-            for (int c = 0; c < members.Count; c++) foreach (var i in members[c]) labels[i] = c;
-            return labels;
+            var tree = Precomputed != null && Precomputed.N == Z.Length ? Precomputed : BuildDendrogram(Z);
+            return tree.Cut(K);
         }
-        private static void bj_set(ref int bi, int j) { bi = j; }
 
         // ---- silhouette (euclidean, standardized) ----
         private static double Silhouette(double[][] Z, int[] labels)

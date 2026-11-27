@@ -128,13 +128,13 @@ topic('anomalies','Prepare data','Detect anomalies with Gaussian density',
 ],('correlation','normalization','prepare'))
 
 topic('normalization','Prepare data','Normalize numeric values',
-      'Make feature scales more comparable and understand the effect on the target.',[
-    steps('Choose ZScore, MinMax or MaxAbs in Prepare data.', 'Apply normalization and inspect the transformed values.',
+      'Make feature scales more comparable while the target keeps its original values.',[
+    steps('Choose ZScore, MinMax or MaxAbs in Prepare data, and pick the target column (the last column by default).', 'Apply normalization and inspect the transformed values.',
           'Train your model on the resulting dataset. For supported models, Predict accepts original feature values and applies the stored transformation.'),
     bullets('ZScore subtracts the mean and divides by the standard deviation. It is useful when columns have different units or magnitudes.',
             'MinMax maps the observed range to a common interval. New inputs outside the original range can produce values outside that interval.',
             'MaxAbs divides by the largest absolute value, preserving zero and the sign of values.'),
-    note('The preparation normalization tool acts on all numeric columns, including the target. The stored recipe restores a supported prediction to the original target scale. Charts and training metrics may still describe the transformed dataset; check the axes and data used for that run.'),
+    note('Normalization scales only the feature columns. The selected target column is never normalized, so targets, predictions and metrics stay in original units. Choose ‘No target’ only for clustering-only data. Models train on the normalized features, while the Dataset page, its data preview, statistics and dataset exports keep showing the original values.'),
     p('Applying transformations repeatedly changes the data repeatedly. Use the original CSV to start over rather than treating Reset page as undo. Scaling does not remove outliers or make a nonlinear relationship linear.')
 ],('prediction','pca','evaluation','reset'))
 
@@ -326,14 +326,14 @@ topic('clustering','Clustering','Find groups without a target',
 
 for id,title,summary,settings,behavior in [
  ('kmeans','K-Means','Partition observations around a chosen number of centers.',
-  'K sets the number of clusters; Iterations limits optimization. Start with a small K, inspect sizes and silhouette, and compare several plausible choices.',
+  'Click Show elbow method first: it plots the within-cluster sum of squares (WCSS) for k = 1 up to the largest k you enter and suggests the bend. Click a point (or type k) to choose the number of clusters, then run. Iterations limits optimization; also inspect sizes and silhouette.',
   'Works best for compact groups under the selected distance representation. It assigns new observations to the nearest center and does not identify noise by itself.'),
  ('dbscan','DBSCAN','Find dense groups and identify noise without fixing the number of clusters.',
   'Eps sets the neighborhood radius in standardized feature space; MinPts sets the required neighborhood density. Increase Eps if almost everything is noise, or reduce it if separate groups merge too readily.',
   'Noise has label −1. Assign uses the nearest non-noise labeled training observation; it does not rerun a density test for the new point. Even a distant input may receive a cluster label. If every training point is noise, assignment remains −1.'),
  ('hierarchical','Hierarchical clustering','Merge nearby groups until the requested number remains.',
-  'Choose K and a linkage rule. Single linkage uses the nearest pair and can form chains; Complete uses the farthest pair; Average uses average pairwise distance.',
-  'This method can become expensive for large datasets. The app displays the resulting clusters rather than a dendrogram. Assignment uses the nearest labeled training observation, not a new hierarchical fit.'),
+  'Choose a linkage rule, then click Show dendrogram to see the full merge tree. Click the tree at a height (or type the number of clusters): every branch crossing the red cut line becomes one cluster. Then run. Single linkage uses the nearest pair and can form chains; Complete uses the farthest pair; Average uses average pairwise distance.',
+  'The dendrogram supports up to 2000 rows. Assignment uses the nearest labeled training observation, not a new hierarchical fit.'),
  ('fuzzy','Fuzzy C-Means','Fit cluster centers with soft memberships during training.',
   'K sets the number of centers; Iterations limits optimization; fuzziness M must be greater than 1 and controls the softness of memberships.',
   'The app displays a hard label from the strongest membership. New assignment uses the nearest center; it should not be read as a calibrated class probability.')]:

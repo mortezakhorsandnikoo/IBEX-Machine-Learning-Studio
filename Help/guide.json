@@ -359,13 +359,13 @@
     "Id": "normalization",
     "Category": "Prepare data",
     "Title": "Normalize numeric values",
-    "Summary": "Make feature scales more comparable and understand the effect on the target.",
+    "Summary": "Make feature scales more comparable while the target keeps its original values.",
     "Keywords": "",
     "Blocks": [
       {
         "Kind": "steps",
         "Items": [
-          "Choose ZScore, MinMax or MaxAbs in Prepare data.",
+          "Choose ZScore, MinMax or MaxAbs in Prepare data, and pick the target column (the last column by default).",
           "Apply normalization and inspect the transformed values.",
           "Train your model on the resulting dataset. For supported models, Predict accepts original feature values and applies the stored transformation."
         ]
@@ -380,7 +380,7 @@
       },
       {
         "Kind": "note",
-        "Text": "The preparation normalization tool acts on all numeric columns, including the target. The stored recipe restores a supported prediction to the original target scale. Charts and training metrics may still describe the transformed dataset; check the axes and data used for that run."
+        "Text": "Normalization scales only the feature columns. The selected target column is never normalized, so targets, predictions and metrics stay in original units. Choose ‘No target’ only for clustering-only data. Models train on the normalized features, while the Dataset page, its data preview, statistics and dataset exports keep showing the original values."
       },
       {
         "Kind": "paragraph",
@@ -1698,7 +1698,7 @@
       },
       {
         "Kind": "paragraph",
-        "Text": "K sets the number of clusters; Iterations limits optimization. Start with a small K, inspect sizes and silhouette, and compare several plausible choices."
+        "Text": "Click Show elbow method first: it plots the within-cluster sum of squares (WCSS) for k = 1 up to the largest k you enter and suggests the bend. Click a point (or type k) to choose the number of clusters, then run. Iterations limits optimization; also inspect sizes and silhouette."
       },
       {
         "Kind": "heading",
@@ -1782,7 +1782,7 @@
       },
       {
         "Kind": "paragraph",
-        "Text": "Choose K and a linkage rule. Single linkage uses the nearest pair and can form chains; Complete uses the farthest pair; Average uses average pairwise distance."
+        "Text": "Choose a linkage rule, then click Show dendrogram to see the full merge tree. Click the tree at a height (or type the number of clusters): every branch crossing the red cut line becomes one cluster. Then run. Single linkage uses the nearest pair and can form chains; Complete uses the farthest pair; Average uses average pairwise distance."
       },
       {
         "Kind": "heading",
@@ -1790,7 +1790,7 @@
       },
       {
         "Kind": "paragraph",
-        "Text": "This method can become expensive for large datasets. The app displays the resulting clusters rather than a dendrogram. Assignment uses the nearest labeled training observation, not a new hierarchical fit."
+        "Text": "The dendrogram supports up to 2000 rows. Assignment uses the nearest labeled training observation, not a new hierarchical fit."
       },
       {
         "Kind": "note",

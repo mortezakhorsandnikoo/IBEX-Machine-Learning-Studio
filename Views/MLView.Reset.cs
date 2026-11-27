@@ -61,6 +61,7 @@ namespace ArchiAI.Views
                     _clustPredictBoxes.Clear(); ClustPredictInputs.Children.Clear();
                     TxtClustResults.Text = ClustPredictResult.Text = "";
                     ClustProgress.Visibility = Visibility.Collapsed; BtnClustRun.IsEnabled = true;
+                    ClearClusterDiagnostics();
                     break;
                 case 5:
                     MLRunHistory.Clear(); TxtCompareInfo.Text = "";

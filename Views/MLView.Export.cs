@@ -26,7 +26,7 @@ namespace ArchiAI.Views
                 case 1: return new (string, FrameworkElement)[] { ("missing", MissingChart), ("anomaly", AnomalyChart), ("normalize", NormChart), ("scree", ScreeChart), ("cumulative_variance", CumVarChart), ("pca_scatter", PcaScatterChart) };
                 case 2: return new (string, FrameworkElement)[] { ("cost", CostChart), ("train_scatter", TrainScatter), ("test_scatter", TestScatter), ("residual", ResidualChart), ("importance", ImportanceChart), ("poly_cost", PolyCostChart), ("poly_scatter", PolyScatterChart), ("poly_residual", PolyResidualChart), ("poly_importance", PolyImportanceChart), ("adv_scatter", AdvScatter), ("adv_residual", AdvResidual), ("adv_learning", AdvLearnChart), ("adv_validation", AdvValChart), ("tree", AdvTreeCanvas) };
                 case 3: return new (string, FrameworkElement)[] { ("f1", ClsF1Chart), ("confusion_matrix", ClsConfCanvas) };
-                case 4: return new (string, FrameworkElement)[] { ("cluster_scatter", ClustScatter) };
+                case 4: return new (string, FrameworkElement)[] { ("cluster_scatter", ClustScatter), ("elbow", ClustElbowChart), ("dendrogram", ClustDendroCanvas) };
                 case 5: return new (string, FrameworkElement)[] { ("compare_r2", CompareRegChart), ("compare_rmse", CompareRmseChart), ("compare_classification", CompareClsChart) };
                 case 6: return new (string, FrameworkElement)[] { ("visualization", VizCartesian), ("pie", VizPie), ("radar", VizPolar) };
                 default: return new (string, FrameworkElement)[0];

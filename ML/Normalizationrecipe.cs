@@ -10,11 +10,13 @@ namespace ArchiAI.ML
     // original vs normalized values — this matches whatever PreprocessingEngine did exactly.
     public class NormalizationRecipe
     {
-        public static NormalizationRecipe ForDataset(MLDataset dataset, NormMethod method)
+        // keepColumn: the target column, recorded as an identity map because it is never scaled.
+        public static NormalizationRecipe ForDataset(MLDataset dataset, NormMethod method, int keepColumn = -1)
         {
             var a = new double[dataset.ColCount]; var b = new double[dataset.ColCount];
             for (int c = 0; c < a.Length; c++)
             {
+                if (c == keepColumn) { a[c] = 1; b[c] = 0; continue; }
                 var values = dataset.Rows.Select(row => row[c]).ToArray();
                 double offset = 0, scale = 1;
                 switch (method)

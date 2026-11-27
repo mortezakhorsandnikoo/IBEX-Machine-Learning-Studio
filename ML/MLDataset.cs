@@ -49,6 +49,10 @@ namespace ArchiAI.ML
             return ds;
         }
 
+        // Builds an in-memory dataset (used for display copies such as de-normalized previews).
+        public static MLDataset FromRows(string[] headers, double[][] rows, string[][] rawRows = null) =>
+            new MLDataset { Headers = headers.ToArray(), Rows = rows, RawRows = rawRows };
+
         public double[] GetColumn(int col)
         {
             return Rows.Select(r => r[col]).ToArray();

@@ -274,6 +274,11 @@
                                     <ComboBoxItem Content="Min-Max Normalization"/>
                                     <ComboBoxItem Content="Max-Absolute Scaling"/>
                                 </ComboBox>
+                                <TextBlock Text="Target column (never normalized):" Foreground="#172B45" FontSize="12"/>
+                                <ComboBox x:Name="CmbNormTarget" Background="#F1F5F9" Foreground="#172B45"
+                                  FontSize="12" Padding="8,5" Margin="0,3,0,4"/>
+                                <TextBlock Text="Only feature columns are scaled. The target keeps its original values. Choose ‘No target’ for clustering-only data."
+                                   Foreground="#64748B" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,8"/>
                                 <Button Content="▶ Normalize" Click="Normalize_Click"
                                 Background="#E2E7EF" Foreground="#172B45" Padding="10,8"
                                 BorderThickness="0" Cursor="Hand"/>
@@ -1080,10 +1085,30 @@
                                     <ComboBoxItem Content="Hierarchical"/>
                                     <ComboBoxItem Content="Fuzzy C-Means"/>
                                 </ComboBox>
+                                <StackPanel x:Name="ClustLinkParams" Visibility="Collapsed">
+                                    <TextBlock Text="Linkage" Foreground="#172B45" FontSize="13"/>
+                                    <ComboBox x:Name="CmbClustLinkage" Background="#F1F5F9" Foreground="#172B45" FontSize="13" Padding="8,5" Margin="0,3,0,10" SelectedIndex="1" SelectionChanged="ClustLinkage_Changed">
+                                        <ComboBoxItem Content="single"/>
+                                        <ComboBoxItem Content="average"/>
+                                        <ComboBoxItem Content="complete"/>
+                                    </ComboBox>
+                                </StackPanel>
+                                <!-- Step 1 for K-Means: elbow method -->
+                                <StackPanel x:Name="ClustElbowParams">
+                                    <TextBlock Text="Step 1 · Elbow method: largest k to test" Foreground="#172B45" FontSize="13"/>
+                                    <TextBox x:Name="TxtElbowMaxK" Text="10" FontSize="13" Background="#F1F5F9" Foreground="#172B45" Padding="8,5" BorderBrush="#E2E7EF" Margin="0,3,0,6"/>
+                                    <Button x:Name="BtnClustElbow" Content="📈  Show elbow method" Click="ClustElbow_Click" Background="#E2E7EF" Foreground="#087F73" FontWeight="Bold" Padding="10,8" BorderThickness="0" Cursor="Hand" Margin="0,0,0,10"/>
+                                </StackPanel>
+                                <!-- Step 1 for Hierarchical: dendrogram -->
+                                <StackPanel x:Name="ClustDendroParams" Visibility="Collapsed">
+                                    <TextBlock Text="Step 1 · View the hierarchy" Foreground="#172B45" FontSize="13"/>
+                                    <Button x:Name="BtnClustDendro" Content="🌳  Show dendrogram" Click="ClustDendrogram_Click" Background="#E2E7EF" Foreground="#087F73" FontWeight="Bold" Padding="10,8" BorderThickness="0" Cursor="Hand" Margin="0,3,0,10"/>
+                                </StackPanel>
                                 <!-- K based (KMeans/Hierarchical/Fuzzy) -->
                                 <StackPanel x:Name="ClustKParams">
-                                    <TextBlock Text="Clusters (k)" Foreground="#172B45" FontSize="13"/>
-                                    <TextBox x:Name="TxtClustK" Text="3" FontSize="13" Background="#F1F5F9" Foreground="#172B45" Padding="8,5" BorderBrush="#E2E7EF" Margin="0,3,0,10"/>
+                                    <TextBlock x:Name="TxtClustKLabel" Text="Clusters (k)" Foreground="#172B45" FontSize="13"/>
+                                    <TextBox x:Name="TxtClustK" Text="3" FontSize="13" Background="#F1F5F9" Foreground="#172B45" Padding="8,5" BorderBrush="#E2E7EF" Margin="0,3,0,4" TextChanged="ClustK_TextChanged"/>
+                                    <TextBlock x:Name="TxtClustStepHint" Foreground="#64748B" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10"/>
                                 </StackPanel>
                                 <StackPanel x:Name="ClustIterParams">
                                     <TextBlock Text="Iterations" Foreground="#172B45" FontSize="13"/>
@@ -1098,14 +1123,6 @@
                                     <TextBox x:Name="TxtClustEps" Text="0.8" FontSize="13" Background="#F1F5F9" Foreground="#172B45" Padding="8,5" BorderBrush="#E2E7EF" Margin="0,3,0,10"/>
                                     <TextBlock Text="Min Points" Foreground="#172B45" FontSize="13"/>
                                     <TextBox x:Name="TxtClustMinPts" Text="5" FontSize="13" Background="#F1F5F9" Foreground="#172B45" Padding="8,5" BorderBrush="#E2E7EF" Margin="0,3,0,10"/>
-                                </StackPanel>
-                                <StackPanel x:Name="ClustLinkParams" Visibility="Collapsed">
-                                    <TextBlock Text="Linkage" Foreground="#172B45" FontSize="13"/>
-                                    <ComboBox x:Name="CmbClustLinkage" Background="#F1F5F9" Foreground="#172B45" FontSize="13" Padding="8,5" Margin="0,3,0,10" SelectedIndex="1">
-                                        <ComboBoxItem Content="single"/>
-                                        <ComboBoxItem Content="average"/>
-                                        <ComboBoxItem Content="complete"/>
-                                    </ComboBox>
                                 </StackPanel>
                                 <Button x:Name="BtnClustRun" Content="▶  RUN CLUSTERING" Click="ClustRun_Click" Background="#087F73" Foreground="#F4F6FA" FontWeight="Bold" FontSize="15" Padding="10,12" BorderThickness="0" Cursor="Hand" Margin="0,6,0,0"/>
                                 <ProgressBar x:Name="ClustProgress" Height="5" Margin="0,10,0,0" IsIndeterminate="False" Visibility="Collapsed" Background="#F1F5F9" Foreground="#087F73"/>
@@ -1129,6 +1146,21 @@
                 </ScrollViewer>
                 <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
+                        <Border x:Name="ClustElbowBorder" Background="#FFFFFF" CornerRadius="8" Padding="10" Margin="0,0,0,10">
+                            <StackPanel>
+                                <TextBlock Text="Elbow method · within-cluster sum of squares (WCSS) by k" Foreground="#087F73" FontSize="14" FontWeight="Bold" Margin="5,0,0,2"/>
+                                <TextBlock x:Name="TxtElbowInfo" Foreground="#64748B" FontSize="11" TextWrapping="Wrap" Margin="5,0,0,5" Text="Click ‘Show elbow method’ to plot WCSS for each k."/>
+                                <lvc:CartesianChart x:Name="ClustElbowChart" Height="300"/>
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="ClustDendroBorder" Background="#FFFFFF" CornerRadius="8" Padding="10" Margin="0,0,0,10" Visibility="Collapsed">
+                            <StackPanel>
+                                <TextBlock Text="Dendrogram · hierarchical merge tree" Foreground="#087F73" FontSize="14" FontWeight="Bold" Margin="5,0,0,2"/>
+                                <TextBlock x:Name="TxtDendroInfo" Foreground="#64748B" FontSize="11" TextWrapping="Wrap" Margin="5,0,0,5" Text="Click at a height to cut the tree. Every branch crossing the red line becomes one cluster."/>
+                                <Canvas x:Name="ClustDendroCanvas" Height="360" Background="White" ClipToBounds="True" Cursor="Cross"
+                                        MouseLeftButtonDown="ClustDendro_MouseDown" SizeChanged="ClustDendro_SizeChanged"/>
+                            </StackPanel>
+                        </Border>
                         <Border Background="#FFFFFF" CornerRadius="8" Padding="10">
                             <StackPanel>
                                 <TextBlock Text="Clusters (PC1 vs PC2)" Foreground="#087F73" FontSize="14" FontWeight="Bold" Margin="5,0,0,5"/>

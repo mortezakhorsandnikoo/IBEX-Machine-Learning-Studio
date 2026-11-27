@@ -57,7 +57,7 @@ namespace ArchiAI.Views
 
         private void LoadCsv_Click(object sender, RoutedEventArgs e)
         {
-            if (IsTrainingPolynomial) return;
+            if (IsTrainingPolynomial) { TxtDataStatus.Text = "Wait for polynomial training to finish before importing another dataset."; return; }
             var dlg = new OpenFileDialog { Filter = "CSV Files|*.csv" };
             if (dlg.ShowDialog() != true) return;
 
@@ -78,6 +78,9 @@ namespace ArchiAI.Views
                 if (loaded.RowCount < 2 || loaded.ColCount < 2)
                     throw new ArgumentException("Use a CSV with at least two numeric rows and two columns.");
                 // ===== RESET EVERYTHING =====
+                // A new import replaces the whole workspace: every page is cleared exactly as
+                // if the user had pressed Reset page on each one, so no old results remain.
+                for (int page = 0; page < _pageResetVersions.Length; page++) ResetWorkspacePage(page);
                 ResetAllTabs();
 
                 // Load new data
@@ -120,6 +123,7 @@ namespace ArchiAI.Views
                 }
                 CmbStatCol.SelectedIndex = 0;
                 CmbTarget.SelectedIndex = _dataset.ColCount - 1;
+                FillNormTargetCombo();
 
                 // Correlation matrix
                 DrawCorrelationMatrix();
@@ -236,30 +240,32 @@ namespace ArchiAI.Views
         {
             if (_dataset == null || CmbStatCol.SelectedIndex < 0) return;
             int col = CmbStatCol.SelectedIndex;
+            var ds = DisplayDataset(); // statistics describe original (de-normalized) values
+            if (col >= ds.ColCount) return;
 
             try
             {
                 var sb = new StringBuilder();
-                sb.AppendLine($"Column: {_dataset.Headers[col]}");
+                sb.AppendLine($"Column: {ds.Headers[col]}");
                 sb.AppendLine($"────────────────────────");
-                sb.AppendLine($"Count:      {_dataset.RowCount}");
-                sb.AppendLine($"Missing:    {_dataset.MissingCount(col)}");
-                sb.AppendLine($"Mean:       {_dataset.Mean(col):G6}");
-                sb.AppendLine($"Median:     {_dataset.Median(col):G6}");
-                sb.AppendLine($"Mode:       {_dataset.Mode(col):G6}");
-                sb.AppendLine($"Std Dev:    {_dataset.StdDev(col):G6}");
-                sb.AppendLine($"Min:        {_dataset.Min(col):G6}");
-                sb.AppendLine($"Max:        {_dataset.Max(col):G6}");
-                sb.AppendLine($"Range:      {_dataset.Range(col):G6}");
-                sb.AppendLine($"Q1 (25%):   {_dataset.Q1(col):G6}");
-                sb.AppendLine($"Q3 (75%):   {_dataset.Q3(col):G6}");
-                sb.AppendLine($"IQR:        {_dataset.IQR(col):G6}");
-                sb.AppendLine($"Skewness:   {_dataset.Skewness(col):G6}");
-                sb.AppendLine($"Kurtosis:   {_dataset.Kurtosis(col):G6}");
+                sb.AppendLine($"Count:      {ds.RowCount}");
+                sb.AppendLine($"Missing:    {ds.MissingCount(col)}");
+                sb.AppendLine($"Mean:       {ds.Mean(col):G6}");
+                sb.AppendLine($"Median:     {ds.Median(col):G6}");
+                sb.AppendLine($"Mode:       {ds.Mode(col):G6}");
+                sb.AppendLine($"Std Dev:    {ds.StdDev(col):G6}");
+                sb.AppendLine($"Min:        {ds.Min(col):G6}");
+                sb.AppendLine($"Max:        {ds.Max(col):G6}");
+                sb.AppendLine($"Range:      {ds.Range(col):G6}");
+                sb.AppendLine($"Q1 (25%):   {ds.Q1(col):G6}");
+                sb.AppendLine($"Q3 (75%):   {ds.Q3(col):G6}");
+                sb.AppendLine($"IQR:        {ds.IQR(col):G6}");
+                sb.AppendLine($"Skewness:   {ds.Skewness(col):G6}");
+                sb.AppendLine($"Kurtosis:   {ds.Kurtosis(col):G6}");
                 TxtColStats.Text = sb.ToString();
 
                 // Histogram
-                var (edges, counts) = _dataset.Histogram(col, 20);
+                var (edges, counts) = ds.Histogram(col, 20);
                 var values = new List<double>();
                 var labels = new List<string>();
                 for (int i = 0; i < counts.Length; i++)
@@ -306,10 +312,11 @@ namespace ArchiAI.Views
         private void DrawCorrelationMatrix()
         {
             if (_dataset == null || DataPreview.ItemsSource == null) return;
+            var ds = DisplayDataset();
 
             CorrCanvas.Children.Clear();
-            int n = _dataset.ColCount;
-            var corr = _dataset.CorrelationMatrix();
+            int n = ds.ColCount;
+            var corr = ds.CorrelationMatrix();
 
             double canvasW = CorrCanvas.ActualWidth > 10 ? CorrCanvas.ActualWidth : 340;
             double canvasH = Math.Max(200, n * 30 + 40);
@@ -328,8 +335,8 @@ namespace ArchiAI.Views
                 // Header labels
                 for (int j = 0; j < n; j++)
                 {
-                    string name = _dataset.Headers[j].Length > 8
-                        ? _dataset.Headers[j].Substring(0, 8) : _dataset.Headers[j];
+                    string name = ds.Headers[j].Length > 8
+                        ? ds.Headers[j].Substring(0, 8) : ds.Headers[j];
                     var ft = MkTxt(name, 9, Brushes.Gray);
                     dc.DrawText(ft, new Point(labelW + j * cellW + cellW / 2 - ft.Width / 2, 0));
                 }
@@ -338,8 +345,8 @@ namespace ArchiAI.Views
                 for (int i = 0; i < n; i++)
                 {
                     // Row label
-                    string name = _dataset.Headers[i].Length > 10
-                        ? _dataset.Headers[i].Substring(0, 10) : _dataset.Headers[i];
+                    string name = ds.Headers[i].Length > 10
+                        ? ds.Headers[i].Substring(0, 10) : ds.Headers[i];
                     var ft = MkTxt(name, 9, Brushes.Gray);
                     dc.DrawText(ft, new Point(0, 25 + i * cellH + cellH / 2 - ft.Height / 2));
 
@@ -1161,6 +1168,7 @@ namespace ArchiAI.Views
             TxtFileName.Text = "No file loaded";
             CmbStatCol.Items.Clear();
             CmbTarget.Items.Clear();
+            CmbNormTarget.Items.Clear();
             CorrCanvas.Children.Clear();
 
             // Stats panel
@@ -1350,8 +1358,9 @@ namespace ArchiAI.Views
             try
             {
                 var method = (NormMethod)CmbNormMethod.SelectedIndex;
-                var result = PreprocessingEngine.NormalizeData(_dataset, method);
-                var normalization = NormalizationRecipe.ForDataset(_dataset, method);
+                int keepTarget = NormTargetIndex(); // the target is never normalized
+                var result = PreprocessingEngine.NormalizeData(_dataset, method, keepTarget);
+                var normalization = NormalizationRecipe.ForDataset(_dataset, method, keepTarget);
 
                 // Show preview table
                 var dt = new DataTable();
@@ -1432,7 +1441,8 @@ namespace ArchiAI.Views
                 _preprocessingSteps.Add(new PreprocessingStep { Normalization = normalization });
                 _loadedCsvPath = normPath;
                 RefreshDataPreview();
-                PrepStatus($"Normalization applied to dataset ({result.MethodName}). Saved: {normPath}");
+                string kept = keepTarget >= 0 ? $" Target '{result.Headers[keepTarget]}' kept in original units." : "";
+                PrepStatus($"Normalization applied to features ({result.MethodName}).{kept} Models train on normalized features; the Dataset page still shows original values. Saved: {normPath}");
             }
             catch (Exception ex) { PrepStatus("Normalize error: " + ex.Message); }
         }
@@ -1632,18 +1642,21 @@ namespace ArchiAI.Views
             ResetVisualization();
             RefreshPolyCombos();
             RefreshVizCombos();
+            ClearClusterDiagnostics(); // elbow/dendrogram describe the previous data
 
+            var display = DisplayDataset(); // original values, even after normalization
             var dt = new DataTable();
-            foreach (var h in _dataset.Headers) dt.Columns.Add(h);
-            int previewCount = Math.Min(_dataset.RowCount, 500);
+            foreach (var h in display.Headers) dt.Columns.Add(h);
+            int previewCount = Math.Min(display.RowCount, 500);
             for (int i = 0; i < previewCount; i++)
             {
                 var row = dt.NewRow();
-                for (int j = 0; j < _dataset.ColCount; j++)
-                    row[j] = _dataset.Rows[i][j].ToString("G6", CultureInfo.InvariantCulture);
+                for (int j = 0; j < display.ColCount; j++)
+                    row[j] = display.Rows[i][j].ToString("G6", CultureInfo.InvariantCulture);
                 dt.Rows.Add(row);
             }
             DataPreview.ItemsSource = dt.DefaultView;
+            FillNormTargetCombo();
 
             // Update combos
             CmbStatCol.Items.Clear();
@@ -1656,7 +1669,9 @@ namespace ArchiAI.Views
             if (CmbStatCol.Items.Count > 0) CmbStatCol.SelectedIndex = 0;
             if (CmbTarget.Items.Count > 0) CmbTarget.SelectedIndex = _dataset.ColCount - 1;
 
-            TxtDataInfo.Text = $"Rows: {_dataset.RowCount}\nColumns: {_dataset.ColCount}";
+            TxtDataInfo.Text = $"Rows: {_dataset.RowCount}\nColumns: {_dataset.ColCount}" +
+                (HasNormalizationStep ? "\n\nShowing original values. Models train on the normalized features." : "");
+            DrawCorrelationMatrix();
         }
 
         // ===================== HELPERS =====================
