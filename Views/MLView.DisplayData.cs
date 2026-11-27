@@ -1,4 +1,6 @@
 using ArchiAI.ML;
+using System;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Controls;
 
@@ -24,7 +26,21 @@ namespace ArchiAI.Views
                         values[c] = recipe.Inverse(headers[c], values[c]);
                 return values;
             }).ToArray();
+            // Undoing a scale leaves floating-point residue (0 → 5.55e-17, 0.3 → 0.30000000000000004).
+            // Snap values that are negligible for their column to 0 and round to 12 significant digits.
+            for (int c = 0; c < headers.Length; c++)
+            {
+                double magnitude = rows.Max(r => double.IsFinite(r[c]) ? Math.Abs(r[c]) : 0);
+                foreach (var r in rows) r[c] = CleanInverse(r[c], magnitude);
+            }
             return MLDataset.FromRows(headers, rows, _dataset.RawRows);
+        }
+
+        private static double CleanInverse(double value, double columnMagnitude)
+        {
+            if (!double.IsFinite(value) || value == 0) return value;
+            if (Math.Abs(value) <= 1e-9 * columnMagnitude) return 0;
+            return double.Parse(value.ToString("G12", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
         }
 
         private bool HasNormalizationStep => _preprocessingSteps.Any(s => s.Normalization != null);

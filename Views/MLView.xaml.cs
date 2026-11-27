@@ -57,7 +57,7 @@ namespace ArchiAI.Views
 
         private void LoadCsv_Click(object sender, RoutedEventArgs e)
         {
-            if (IsTrainingPolynomial) return;
+            if (IsTrainingPolynomial) { TxtDataStatus.Text = "Wait for polynomial training to finish before importing another dataset."; return; }
             var dlg = new OpenFileDialog { Filter = "CSV Files|*.csv" };
             if (dlg.ShowDialog() != true) return;
 
@@ -78,6 +78,9 @@ namespace ArchiAI.Views
                 if (loaded.RowCount < 2 || loaded.ColCount < 2)
                     throw new ArgumentException("Use a CSV with at least two numeric rows and two columns.");
                 // ===== RESET EVERYTHING =====
+                // A new import replaces the whole workspace: every page is cleared exactly as
+                // if the user had pressed Reset page on each one, so no old results remain.
+                for (int page = 0; page < _pageResetVersions.Length; page++) ResetWorkspacePage(page);
                 ResetAllTabs();
 
                 // Load new data
