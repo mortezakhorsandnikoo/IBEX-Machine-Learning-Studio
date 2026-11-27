@@ -41,7 +41,8 @@ namespace ArchiAI.Views
             ClustLinkParams.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
             ClustElbowParams.Visibility = i == 0 ? Visibility.Visible : Visibility.Collapsed;
             ClustDendroParams.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
-            ClustElbowBorder.Visibility = i == 0 && _elbowCurve != null ? Visibility.Visible : Visibility.Collapsed;
+            // The elbow chart stays laid out for K-Means (a chart created while collapsed can stay blank).
+            ClustElbowBorder.Visibility = i == 0 ? Visibility.Visible : Visibility.Collapsed;
             ClustDendroBorder.Visibility = i == 2 && _dendrogram != null ? Visibility.Visible : Visibility.Collapsed;
             if (ClustDendroBorder.Visibility == Visibility.Visible) DrawDendrogram();
             UpdateClustStepHint();

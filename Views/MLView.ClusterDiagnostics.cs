@@ -60,6 +60,7 @@ namespace ArchiAI.Views
                 ClustElbowBorder.Visibility = Visibility.Visible;
                 TxtClustResults.Text = $"Elbow curve ready (k = 1…{curve.Length}). Step 2: choose k, then click RUN CLUSTERING.";
                 DrawElbow();
+                await Dispatcher.InvokeAsync(() => { DrawElbow(); ClustElbowBorder.BringIntoView(); }, System.Windows.Threading.DispatcherPriority.Loaded);
             }
             catch (Exception ex) { if (resetVersion == _pageResetVersions[4]) TxtClustResults.Text = "❌ Elbow method: " + ex.Message; }
             finally { SetClustBusy(false); UpdateClustStepHint(); }
@@ -221,7 +222,7 @@ namespace ArchiAI.Views
         private void ClustK_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (ClustElbowBorder == null) return; // during InitializeComponent
-            if (ClustElbowBorder.Visibility == Visibility.Visible) DrawElbow();
+            if (_elbowCurve != null) DrawElbow();
             if (ClustDendroBorder.Visibility == Visibility.Visible) DrawDendrogram();
         }
 
@@ -261,8 +262,9 @@ namespace ArchiAI.Views
         {
             _elbowCurve = null; _elbowDataset = null; _dendrogram = null; _dendroDataset = null;
             if (ClustElbowBorder == null) return;
-            ClustElbowBorder.Visibility = ClustDendroBorder.Visibility = Visibility.Collapsed;
+            ClustDendroBorder.Visibility = Visibility.Collapsed;
             ClustElbowChart.Series = Array.Empty<ISeries>();
+            TxtElbowInfo.Text = "Click ‘Show elbow method’ to plot WCSS for each k.";
             ClustDendroCanvas.Children.Clear();
             UpdateClustStepHint();
         }

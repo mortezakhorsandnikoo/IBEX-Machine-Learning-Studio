@@ -1146,10 +1146,10 @@
                 </ScrollViewer>
                 <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
-                        <Border x:Name="ClustElbowBorder" Background="#FFFFFF" CornerRadius="8" Padding="10" Margin="0,0,0,10" Visibility="Collapsed">
+                        <Border x:Name="ClustElbowBorder" Background="#FFFFFF" CornerRadius="8" Padding="10" Margin="0,0,0,10">
                             <StackPanel>
                                 <TextBlock Text="Elbow method · within-cluster sum of squares (WCSS) by k" Foreground="#087F73" FontSize="14" FontWeight="Bold" Margin="5,0,0,2"/>
-                                <TextBlock x:Name="TxtElbowInfo" Foreground="#64748B" FontSize="11" TextWrapping="Wrap" Margin="5,0,0,5" Text="Click a point to choose k. The bend (elbow) is where adding clusters stops reducing WCSS much."/>
+                                <TextBlock x:Name="TxtElbowInfo" Foreground="#64748B" FontSize="11" TextWrapping="Wrap" Margin="5,0,0,5" Text="Click ‘Show elbow method’ to plot WCSS for each k."/>
                                 <lvc:CartesianChart x:Name="ClustElbowChart" Height="300"/>
                             </StackPanel>
                         </Border>
