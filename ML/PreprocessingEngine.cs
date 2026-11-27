@@ -320,7 +320,8 @@ namespace ArchiAI.ML
         }
 
         // ================ NORMALIZE ================
-        public static NormalizeResult NormalizeData(MLDataset dataset, NormMethod method)
+        // keepColumn: index of the target column, which is never scaled (-1 = scale every column).
+        public static NormalizeResult NormalizeData(MLDataset dataset, NormMethod method, int keepColumn = -1)
         {
             int rows = dataset.RowCount;
             int cols = dataset.ColCount;
@@ -353,7 +354,10 @@ namespace ArchiAI.ML
 
             var result = new double[rows][];
             for (int i = 0; i < rows; i++)
+            {
                 result[i] = normalized.Row(i).ToArray();
+                if (keepColumn >= 0 && keepColumn < cols) result[i][keepColumn] = dataset.Rows[i][keepColumn];
+            }
 
             return new NormalizeResult
             {

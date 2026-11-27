@@ -55,7 +55,15 @@ internal static partial class Smoke
 
         view.LoadDataset(path); window.ShowSection(1); await Settle(window);
         Find<ComboBox>(view, "CmbNormMethod").SelectedIndex = 0;
+        Assert(Find<ComboBox>(view, "CmbNormTarget").SelectedIndex == 2, "Normalize defaults to the last column as the target");
         Click(view, "Normalize_Click");
+        var normalizedData = Field<MLDataset>(view, "_dataset");
+        Assert(normalizedData.Rows.Select((row, i) => Math.Abs(row[2] - rawRows[i][2])).Max() < 1e-9, "Normalization never scales the target column");
+        Assert(Math.Abs(normalizedData.Rows.Average(row => row[0])) < 1e-9 && Math.Abs(normalizedData.Rows.Average(row => row[1])) < 1e-9,
+            "Feature columns are normalized for training");
+        var preview = (System.Data.DataView)Find<DataGrid>(view, "DataPreview").ItemsSource;
+        Assert(Enumerable.Range(0, 3).All(c => Math.Abs(double.Parse((string)preview[5][c], inv) - rawRows[5][c]) < 1e-3),
+            "Dataset preview keeps showing original values after normalization");
         Find<ComboBox>(view, "CmbPcaMode").SelectedIndex = 1;
         Find<TextBox>(view, "TxtPcaValue").Text = "1";
         Find<CheckBox>(view, "ChkPcaHasTarget").IsChecked = true;
@@ -126,11 +134,24 @@ internal static partial class Smoke
         Assert(Math.Abs(classifier.PredictRaw(raw) - loadedCls.PredictRaw(raw)) < 1e-9, "Classifier save/load preserves original-input prediction");
 
         window.ShowSection(4); Click(view, "ClustRun_Click");
+        Assert(Field<ClusterResult>(view, "_clustResult") == null, "K-Means waits until the elbow method has been shown");
+        Click(view, "ClustElbow_Click");
+        await Until(() => Field<(int k, double wcss)[]>(view, "_elbowCurve") != null, "Elbow method runs before K-Means");
+        Find<TextBox>(view, "TxtClustK").Text = "3";
+        Click(view, "ClustRun_Click");
         await Until(() => Field<ClusterResult>(view, "_clustResult") != null, "Clustering trains on prepared data");
         Assert(Field<PredictionRecipe>(view, "_clustPipeline").InputNames.SequenceEqual(original.Headers),
             "Clustering assignment uses original columns");
         Fill(Field<List<TextBox>>(view, "_clustPredictBoxes"), rawRows[8]); Click(view, "ClustPredict_Click");
         Assert(Find<TextBlock>(view, "ClustPredictResult").Text.StartsWith("Assigned to cluster:"), "Clustering applies PCA internally for assignment");
+        Find<ComboBox>(view, "CmbClustAlgo").SelectedIndex = 2;
+        Click(view, "ClustDendrogram_Click");
+        await Until(() => Field<Dendrogram>(view, "_dendrogram") != null, "Dendrogram is built before hierarchical clustering");
+        Find<TextBox>(view, "TxtClustK").Text = "2";
+        Click(view, "ClustRun_Click");
+        await Until(() => Field<ClusterResult>(view, "_clustResult") is { Type: ClustererType.Hierarchical, NumClusters: 2 },
+            "Hierarchical clustering uses the number of clusters chosen from the dendrogram");
+        Find<ComboBox>(view, "CmbClustAlgo").SelectedIndex = 0;
 
         // Reset each page and verify the trained models on other pages remain usable.
         bool regressionReset = false;

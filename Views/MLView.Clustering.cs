@@ -26,6 +26,7 @@ namespace ArchiAI.Views
         private void ClustPanel_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (!(bool)e.NewValue) return;
+            UpdateClustStepHint();
             if (_clustPredictBoxes.Count == 0 && _clustResult != null) BuildClustPredictInputs();
         }
 
@@ -38,18 +39,31 @@ namespace ArchiAI.Views
             ClustFuzzyParams.Visibility = i == 3 ? Visibility.Visible : Visibility.Collapsed;
             ClustDbscanParams.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
             ClustLinkParams.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
+            ClustElbowParams.Visibility = i == 0 ? Visibility.Visible : Visibility.Collapsed;
+            ClustDendroParams.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
+            ClustElbowBorder.Visibility = i == 0 && _elbowCurve != null ? Visibility.Visible : Visibility.Collapsed;
+            ClustDendroBorder.Visibility = i == 2 && _dendrogram != null ? Visibility.Visible : Visibility.Collapsed;
+            if (ClustDendroBorder.Visibility == Visibility.Visible) DrawDendrogram();
+            UpdateClustStepHint();
         }
 
         private async void ClustRun_Click(object sender, RoutedEventArgs e)
         {
             if (_dataset == null) { TxtClustResults.Text = "Load data first!"; return; }
-            var engine = new ClusteringEngine { Type = (ClustererType)CmbClustAlgo.SelectedIndex };
+            var type = (ClustererType)CmbClustAlgo.SelectedIndex;
+            // Step 1 comes first: the elbow chart (K-Means) or dendrogram (Hierarchical) guides the choice of k.
+            if (type == ClustererType.KMeans && !ElbowReady)
+            { TxtClustResults.Text = "Step 1: click ‘Show elbow method’ and choose k from the chart, then run K-Means."; UpdateClustStepHint(); return; }
+            if (type == ClustererType.Hierarchical && !DendrogramReady)
+            { TxtClustResults.Text = "Step 1: click ‘Show dendrogram’ and choose the number of clusters, then run hierarchical clustering."; UpdateClustStepHint(); return; }
+            var engine = new ClusteringEngine { Type = type };
             if (int.TryParse(TxtClustK.Text, out int k) && k > 0) engine.K = k;
             if (int.TryParse(TxtClustIter.Text, out int it) && it > 0) engine.Iterations = it;
             if (double.TryParse(TxtClustM.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double mm) && mm > 1) engine.Fuzziness = mm;
             if (double.TryParse(TxtClustEps.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double eps) && eps > 0) engine.Eps = eps;
             if (int.TryParse(TxtClustMinPts.Text, out int mp) && mp > 0) engine.MinPts = mp;
-            engine.Linkage = (CmbClustLinkage.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "average";
+            engine.Linkage = SelectedLinkage();
+            if (type == ClustererType.Hierarchical) engine.Precomputed = _dendrogram; // same tree the user just cut
 
             BtnClustRun.IsEnabled = false; ClustProgress.Visibility = Visibility.Visible; ClustProgress.IsIndeterminate = true;
             TxtClustResults.Text = "Clustering...";

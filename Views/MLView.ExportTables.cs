@@ -75,12 +75,13 @@ namespace ArchiAI.Views
             }
             if (_dataset != null && DataPreview.ItemsSource != null && MainTabs.SelectedIndex == 0)
             {
-                var rows = new List<object[]> { new object[] { "Column" }.Concat(_dataset.Headers.Cast<object>()).ToArray() };
-                var matrix = _dataset.CorrelationMatrix();
-                for (int i = 0; i < _dataset.ColCount; i++)
-                    rows.Add(new object[] { _dataset.Headers[i] }.Concat(Enumerable.Range(0, _dataset.ColCount).Select(j => (object)matrix[i, j])).ToArray());
+                var ds = DisplayDataset(); // export the original values shown on the Dataset page
+                var rows = new List<object[]> { new object[] { "Column" }.Concat(ds.Headers.Cast<object>()).ToArray() };
+                var matrix = ds.CorrelationMatrix();
+                for (int i = 0; i < ds.ColCount; i++)
+                    rows.Add(new object[] { ds.Headers[i] }.Concat(Enumerable.Range(0, ds.ColCount).Select(j => (object)matrix[i, j])).ToArray());
                 output["correlation_matrix"] = CsvRows(rows);
-                output["dataset"] = CsvRows(new[] { _dataset.Headers.Cast<object>() }.Concat(_dataset.Rows.Select(row => row.Cast<object>())));
+                output["dataset"] = CsvRows(new[] { ds.Headers.Cast<object>() }.Concat(ds.Rows.Select(row => row.Cast<object>())));
             }
             if (MainTabs.SelectedIndex == 2 && ExportableCharts().Length > 0)
             {

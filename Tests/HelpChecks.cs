@@ -49,6 +49,9 @@ internal static partial class Smoke
         System.IO.File.WriteAllText(sample, "Feature A,Feature B\n" + string.Join("\n", rows.Select(r => string.Join(",", r.Select(v => v.ToString("R", System.Globalization.CultureInfo.InvariantCulture))))));
         Assert(workspace.LoadDataset(sample), "Synthetic illustration dataset loads");
         window.ShowSection(4); await Settle(window);
+        Click(workspace, "ClustElbow_Click");
+        await Until(() => Field<(int k, double wcss)[]>(workspace, "_elbowCurve") != null, "Elbow method precedes K-Means");
+        Find<TextBox>(workspace, "TxtClustK").Text = "3";
         Click(workspace, "ClustRun_Click");
         await Until(() => Field<ClusterResult>(workspace, "_clustResult") != null, "Synthetic clustering completes for illustration");
         var trained = Field<ClusterResult>(workspace, "_clustResult");
